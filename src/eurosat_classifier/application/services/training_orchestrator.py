@@ -12,7 +12,6 @@ from eurosat_classifier.application.contracts import (
     Trainer,
 )
 from eurosat_classifier.domain.metrics import MetricSummary
-from eurosat_classifier.infrastructure.reproducibility import set_seed
 
 
 class TrainingOrchestrator:
@@ -41,8 +40,6 @@ class TrainingOrchestrator:
         output_dir: str,
         report_output_path: str,
     ) -> dict[str, Any]:
-        set_seed(config.split.seed)
-
         model = self._model_factory.create(config.model_name)
         loaders = self._data_loader_factory.create(split_artifacts, config.batch_size)
 

@@ -131,9 +131,13 @@ Implementation status:
 - `src/eurosat_classifier/domain/metrics_calculator.py`
 - `src/eurosat_classifier/application/services/training_orchestrator.py`
 - `src/eurosat_classifier/infrastructure/evaluation/report_writer.py`
+- `src/eurosat_classifier/infrastructure/reproducibility.py` (`set_seed` for random, NumPy, Torch CPU/CUDA, deterministic cuDNN)
+- `src/eurosat_classifier/application/services/training_orchestrator.py` (global seed applied from config split seed)
+- `src/eurosat_classifier/application/services/training_orchestrator.py` (CLI payload now includes confusion matrix for report parity)
 - `tests/test_metrics_calculator.py`
 - `tests/test_report_writer.py`
 - `tests/test_training_orchestrator.py`
+- Smoke reproducibility verified with two consecutive baseline smoke runs producing identical loss/accuracy/F1 outputs
 
 ## 5. EfficientNetB0 Fine-Tuning (Milos Scope)
 
@@ -227,9 +231,9 @@ Folders and files:
 
 ## Current Phase Recommendation
 
-Start with Phase 2, then Phase 3, then Phase 5.
+Start with Phase 5.
 
 Reason:
-- Phase 2 guarantees deterministic and valid inputs.
-- Phase 3 creates the baseline reference needed for all comparisons.
+- Phases 1, 2, 3, and 4 are completed and validated.
+- Reproducibility and CLI/report consistency are now enforced in the shared engine.
 - Phase 5 delivers your owned advanced model (EfficientNetB0) on top of stable shared infrastructure.

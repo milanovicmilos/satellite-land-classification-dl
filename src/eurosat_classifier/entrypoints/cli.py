@@ -20,6 +20,7 @@ from eurosat_classifier.infrastructure.evaluation.baseline_evaluator import Base
 from eurosat_classifier.infrastructure.evaluation.report_writer import JsonReportWriter
 from eurosat_classifier.infrastructure.logging import configure_logging
 from eurosat_classifier.infrastructure.models.factory import SharedModelFactory
+from eurosat_classifier.infrastructure.reproducibility import set_seed
 from eurosat_classifier.infrastructure.training.baseline_trainer import BaselineTrainer
 from eurosat_classifier.infrastructure.training.split_json_loader import SplitJsonLoaderFactory
 
@@ -106,6 +107,7 @@ def main() -> int:
     if args.run_baseline:
         config_loader = JsonConfigLoader(defaults_path=args.defaults)
         config = config_loader.load(args.config)
+        set_seed(config.split.seed)
 
         split_dir = Path(args.splits_output)
         split_artifacts = {

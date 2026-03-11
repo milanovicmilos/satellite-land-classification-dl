@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from PIL import Image
 import torch
 from torch.utils.data import DataLoader, Dataset
@@ -30,10 +31,8 @@ class SplitJsonDataset(Dataset):
             if image.size != (self._image_size, self._image_size):
                 image = image.resize((self._image_size, self._image_size))
 
-            image_data = torch.tensor(list(image.tobytes()), dtype=torch.uint8)
-            image_tensor = image_data.view(self._image_size, self._image_size, 3).permute(2, 0, 1)
-            image_tensor = image_tensor.to(dtype=torch.float32)
-            image_tensor = image_tensor / 255.0
+            image_array = np.array(image, copy=True)
+            image_tensor = torch.from_numpy(image_array).permute(2, 0, 1).to(dtype=torch.float32) / 255.0
 
         label_tensor = torch.tensor(class_index, dtype=torch.long)
         return image_tensor, label_tensor
