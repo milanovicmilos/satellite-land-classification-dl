@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eurosat-land-classification"
+version = "0.1.0"
+description = "EuroSAT land-use classification project scaffold"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+  { name = "Milos Milanovic" },
+  { name = "Bojan Zivanic" },
+]
+dependencies = []
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

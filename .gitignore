@@ -1,0 +1,32 @@
+# Python cache and environments
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE files
+.idea/
+.vscode/*.code-workspace
+
+# Runtime outputs
+runs/
+artifacts/
+checkpoints/
+logs/
+
+# Dataset storage
+data/*
+!data/.gitkeep
+!data/README.md
