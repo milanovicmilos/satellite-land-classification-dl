@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "schema_version": "1.0.0",
+    "protocol_id": "eurosat-eval-v1",
+    "description": "Canonical defaults for reproducible EuroSAT experiments"
+  },
+  "experiment_name": "default-experiment",
+  "dataset_root": "data/EuroSAT",
+  "split": {
+    "train_ratio": 0.7,
+    "validation_ratio": 0.15,
+    "test_ratio": 0.15,
+    "seed": 42,
+    "stratified": true
+  },
+  "training": {
+    "epochs": 25,
+    "batch_size": 32,
+    "early_stopping_patience": 5
+  },
+  "evaluation_protocol": {
+    "primary_metric": "accuracy",
+    "secondary_metrics": [
+      "macro_f1_score",
+      "confusion_matrix",
+      "per_class_precision",
+      "per_class_recall"
+    ]
+  },
+  "comparison_table_schema": {
+    "id": "eurosat-model-comparison-v1",
+    "columns": [
+      "model_name",
+      "split_seed",
+      "train_ratio",
+      "validation_ratio",
+      "test_ratio",
+      "accuracy",
+      "macro_f1_score",
+      "checkpoint_path",
+      "run_id",
+      "created_at_utc"
+    ]
+  },
+  "acceptance_criteria": {
+    "baseline_cnn": {
+      "requirements": [
+        "train_valid_test_pipeline_completes",
+        "test_metrics_written",
+        "confusion_matrix_exported"
+      ]
+    },
+    "efficientnet_b0": {
+      "requirements": [
+        "frozen_backbone_stage_runs",
+        "fine_tuning_stage_runs",
+        "metrics_compared_against_baseline"
+      ]
+    }
+  }
+}

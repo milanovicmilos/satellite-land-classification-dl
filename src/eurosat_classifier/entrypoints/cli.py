@@ -34,6 +34,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to an experiment configuration file.",
     )
     parser.add_argument(
+        "--defaults",
+        default="configs/experiment.defaults.json",
+        help="Path to canonical default configuration values.",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Validate the scaffold and print the resolved experiment payload.",
@@ -49,7 +54,10 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.dry_run:
-        use_case = StartTraining(JsonConfigLoader(), DryRunTrainingRunner())
+        use_case = StartTraining(
+            JsonConfigLoader(defaults_path=args.defaults),
+            DryRunTrainingRunner(),
+        )
         print(use_case.execute(args.config))
         return 0
 

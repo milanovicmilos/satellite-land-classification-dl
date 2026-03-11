@@ -1,0 +1,26 @@
+{
+  "manifest_version": "1.0.0",
+  "status": "locked",
+  "dataset": {
+    "path": "data/EuroSAT",
+    "format": "jpeg",
+    "channel_mode": "rgb",
+    "class_count": 10
+  },
+  "split": {
+    "strategy": "stratified",
+    "train_ratio": 0.7,
+    "validation_ratio": 0.15,
+    "test_ratio": 0.15,
+    "seed": 42
+  },
+  "comparison_table_schema": {
+    "id": "eurosat-model-comparison-v1",
+    "source": "configs/experiment.defaults.json"
+  },
+  "evaluation_protocol": {
+    "id": "eurosat-eval-v1",
+    "source": "docs/evaluation_protocol.md"
+  },
+  "notes": "This manifest freezes canonical split and protocol metadata before training implementation phases."
+}

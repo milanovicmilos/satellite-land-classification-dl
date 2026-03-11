@@ -18,12 +18,13 @@ class CliTests(unittest.TestCase):
         parsed = parser.parse_args(["--dry-run"])
 
         self.assertTrue(parsed.dry_run)
+        self.assertEqual(parsed.defaults, "configs/experiment.defaults.json")
 
     def test_dry_run_training_runner_returns_json_payload(self) -> None:
         runner = DryRunTrainingRunner()
         experiment = Experiment(
             name="demo",
-            dataset_root="data/EuroSAT_RGB",
+            dataset_root="data/EuroSAT",
             model_name="baseline_cnn",
             split=DatasetSplit(0.7, 0.15, 0.15, 42),
         )
