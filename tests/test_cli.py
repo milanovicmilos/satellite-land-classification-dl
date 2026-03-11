@@ -28,6 +28,14 @@ class CliTests(unittest.TestCase):
 
         self.assertTrue(parsed.prepare_dataset)
 
+    def test_build_parser_supports_run_baseline(self) -> None:
+        parser = build_parser()
+
+        parsed = parser.parse_args(["--run-baseline"])
+
+        self.assertTrue(parsed.run_baseline)
+        self.assertEqual(parsed.reports_output, "artifacts/reports/baseline_metrics.json")
+
     def test_dry_run_training_runner_returns_json_payload(self) -> None:
         runner = DryRunTrainingRunner()
         experiment = Experiment(

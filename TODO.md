@@ -81,10 +81,10 @@ Goal:
 - Deliver the complete baseline training and evaluation flow used as reference for all comparisons.
 
 Work items:
-- [ ] Implement baseline CNN model module.
-- [ ] Implement training loop with early stopping and checkpoint saving.
-- [ ] Implement evaluation on test split with required metrics.
-- [ ] Export baseline result summary artifact.
+- [x] Implement baseline CNN model module.
+- [x] Implement training loop with early stopping and checkpoint saving.
+- [x] Implement evaluation on test split with required metrics.
+- [x] Export baseline result summary artifact.
 
 Folders and files:
 - Existing: `src/eurosat_classifier/infrastructure/models/registry.py`
@@ -97,15 +97,25 @@ Folders and files:
 - Planned: `src/eurosat_classifier/infrastructure/checkpointing/store.py`
 - Planned: `artifacts/reports/baseline_metrics.json`
 
+Implementation status:
+- `src/eurosat_classifier/infrastructure/models/baseline_cnn.py` (real CNN model)
+- `src/eurosat_classifier/infrastructure/models/factory.py`
+- `src/eurosat_classifier/infrastructure/training/split_json_loader.py` (PyTorch dataloaders)
+- `src/eurosat_classifier/infrastructure/training/baseline_trainer.py` (real train loop)
+- `src/eurosat_classifier/infrastructure/evaluation/baseline_evaluator.py` (forward-pass evaluation)
+- `src/eurosat_classifier/infrastructure/checkpointing/store.py` (best `.pt` checkpoint + metadata)
+- `src/eurosat_classifier/entrypoints/cli.py` (`--run-baseline` flow)
+- `artifacts/reports/baseline_metrics.json` and `artifacts/reports/baseline_smoke_metrics.json` generated via CLI
+
 ## 4. Shared Training Engine And Evaluation Core
 
 Goal:
 - Avoid duplicated logic and keep architecture clean across baseline, EfficientNetB0, and ResNet50.
 
 Work items:
-- [ ] Define stable interfaces for model factory, dataloaders, trainer, evaluator, checkpoint store.
-- [ ] Centralize metric calculation and report serialization.
-- [ ] Keep framework-specific details in infrastructure layer only.
+- [x] Define stable interfaces for model factory, dataloaders, trainer, evaluator, checkpoint store.
+- [x] Centralize metric calculation and report serialization.
+- [x] Keep framework-specific details in infrastructure layer only.
 
 Folders and files:
 - Existing: `src/eurosat_classifier/application/contracts.py`
@@ -115,6 +125,15 @@ Folders and files:
 - Planned: `src/eurosat_classifier/application/services/training_orchestrator.py`
 - Planned: `src/eurosat_classifier/infrastructure/evaluation/report_writer.py`
 - Planned: `tests/test_metrics_calculator.py`
+
+Implementation status:
+- `src/eurosat_classifier/application/contracts.py` (shared engine protocols)
+- `src/eurosat_classifier/domain/metrics_calculator.py`
+- `src/eurosat_classifier/application/services/training_orchestrator.py`
+- `src/eurosat_classifier/infrastructure/evaluation/report_writer.py`
+- `tests/test_metrics_calculator.py`
+- `tests/test_report_writer.py`
+- `tests/test_training_orchestrator.py`
 
 ## 5. EfficientNetB0 Fine-Tuning (Milos Scope)
 

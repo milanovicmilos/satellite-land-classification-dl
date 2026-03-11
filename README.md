@@ -37,6 +37,7 @@ The following commands are intended to work in the current scaffold.
 c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m unittest discover -s tests
 $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --dry-run --config configs/baseline.example.json
 $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --prepare-dataset --config configs/baseline.example.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --run-baseline --config configs/baseline.example.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/baseline_metrics.json --checkpoints-output checkpoints/baseline
 ```
 
 ## Reproducibility Assets (Phase 1)
@@ -52,6 +53,7 @@ $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classificati
 
 ## Notes
 
-- This scaffold intentionally leaves dataset integration and deep learning framework wiring for later tasks.
+- Baseline CNN training and evaluation are implemented end-to-end with checkpoint and report outputs.
+- Training reproducibility is enforced through fixed split seed plumbing and global seed setup.
 - The current project specification targets the RGB JPEG dataset in `data/EuroSAT`, not the multispectral TIFF variant.
 - ResNet50-specific implementation should remain Bojan's responsibility unless explicitly requested otherwise.
