@@ -22,13 +22,13 @@ class JsonSplitPersistence:
         self._write_samples(validation_path, prepared_split.validation)
         self._write_samples(test_path, prepared_split.test)
 
-        summary_payload = {
+        manifest_payload = {
             "seed": prepared_split.seed,
             "train_samples": len(prepared_split.train),
             "validation_samples": len(prepared_split.validation),
             "test_samples": len(prepared_split.test),
         }
-        manifest_path.write_text(json.dumps(summary_payload, indent=2), encoding="utf-8")
+        manifest_path.write_text(json.dumps(manifest_payload, indent=2), encoding="utf-8")
 
         return {
             "train": train_path.as_posix(),
