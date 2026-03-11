@@ -41,4 +41,5 @@ $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classificati
 ## Notes
 
 - This scaffold intentionally leaves dataset integration and deep learning framework wiring for later tasks.
+- The current project specification targets the RGB JPEG dataset in `data/EuroSAT`, not the multispectral TIFF variant.
 - ResNet50-specific implementation should remain Bojan's responsibility unless explicitly requested otherwise.
