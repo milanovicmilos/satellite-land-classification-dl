@@ -52,6 +52,7 @@ class _FakeEvaluator:
             macro_f1_score=0.79,
             precision={"A": 0.8},
             recall={"A": 0.78},
+            confusion_matrix=[[4, 1], [0, 5]],
         )
 
 
@@ -109,6 +110,7 @@ class TrainingOrchestratorTests(unittest.TestCase):
             self.assertIn("accuracy", result)
             self.assertIn("checkpoint_path", result)
             self.assertIn("report_path", result)
+            self.assertIn("confusion_matrix", result)
             self.assertEqual(result["training_state"]["epochs_ran"], 3)
 
             report_content = Path(result["report_path"]).read_text(encoding="utf-8")
