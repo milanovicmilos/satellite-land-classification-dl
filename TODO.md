@@ -81,10 +81,10 @@ Goal:
 - Deliver the complete baseline training and evaluation flow used as reference for all comparisons.
 
 Work items:
-- [ ] Implement baseline CNN model module.
-- [ ] Implement training loop with early stopping and checkpoint saving.
-- [ ] Implement evaluation on test split with required metrics.
-- [ ] Export baseline result summary artifact.
+- [x] Implement baseline CNN model module.
+- [x] Implement training loop with early stopping and checkpoint saving.
+- [x] Implement evaluation on test split with required metrics.
+- [x] Export baseline result summary artifact.
 
 Folders and files:
 - Existing: `src/eurosat_classifier/infrastructure/models/registry.py`
@@ -97,16 +97,15 @@ Folders and files:
 - Planned: `src/eurosat_classifier/infrastructure/checkpointing/store.py`
 - Planned: `artifacts/reports/baseline_metrics.json`
 
-Implementation status (bootstrap, current branch):
-- `src/eurosat_classifier/infrastructure/models/baseline_cnn.py`
+Implementation status:
+- `src/eurosat_classifier/infrastructure/models/baseline_cnn.py` (real CNN model)
 - `src/eurosat_classifier/infrastructure/models/factory.py`
-- `src/eurosat_classifier/infrastructure/training/baseline_trainer.py`
-- `src/eurosat_classifier/infrastructure/evaluation/baseline_evaluator.py`
-- `src/eurosat_classifier/infrastructure/checkpointing/store.py`
-- `artifacts/reports/baseline_metrics.json` generated via CLI
-
-Next step for this phase:
-- Replace bootstrap baseline heuristic with an actual CNN training implementation while reusing the shared engine contracts.
+- `src/eurosat_classifier/infrastructure/training/split_json_loader.py` (PyTorch dataloaders)
+- `src/eurosat_classifier/infrastructure/training/baseline_trainer.py` (real train loop)
+- `src/eurosat_classifier/infrastructure/evaluation/baseline_evaluator.py` (forward-pass evaluation)
+- `src/eurosat_classifier/infrastructure/checkpointing/store.py` (best `.pt` checkpoint + metadata)
+- `src/eurosat_classifier/entrypoints/cli.py` (`--run-baseline` flow)
+- `artifacts/reports/baseline_metrics.json` and `artifacts/reports/baseline_smoke_metrics.json` generated via CLI
 
 ## 4. Shared Training Engine And Evaluation Core
 

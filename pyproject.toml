@@ -12,7 +12,11 @@ authors = [
   { name = "Milos Milanovic" },
   { name = "Bojan Zivanic" },
 ]
-dependencies = []
+dependencies = [
+  "torch>=2.5.0",
+  "Pillow>=10.4.0",
+  "numpy>=2.2.0",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
