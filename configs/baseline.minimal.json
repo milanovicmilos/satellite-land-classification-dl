@@ -1,0 +1,6 @@
+{
+  "experiment_name": "baseline-cnn-minimal",
+  "model": {
+    "name": "baseline_cnn"
+  }
+}

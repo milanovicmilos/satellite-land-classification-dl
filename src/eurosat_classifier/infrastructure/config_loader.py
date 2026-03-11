@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 from eurosat_classifier.application.config import TrainingConfig
 from eurosat_classifier.domain.entities import DatasetSplit
@@ -10,8 +11,31 @@ from eurosat_classifier.domain.entities import DatasetSplit
 class JsonConfigLoader:
     """Loads training configuration from a JSON file."""
 
+    def __init__(self, defaults_path: str | None = None) -> None:
+        self._defaults_path = defaults_path
+
+    @staticmethod
+    def _read_json(path: str) -> dict[str, Any]:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+
+    @staticmethod
+    def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+        merged = dict(base)
+        for key, value in override.items():
+            if isinstance(value, dict) and isinstance(merged.get(key), dict):
+                merged[key] = JsonConfigLoader._deep_merge(merged[key], value)
+            else:
+                merged[key] = value
+        return merged
+
     def load(self, path: str) -> TrainingConfig:
-        raw_config = json.loads(Path(path).read_text(encoding="utf-8"))
+        config_data: dict[str, Any] = {}
+
+        if self._defaults_path:
+            config_data = self._read_json(self._defaults_path)
+
+        user_config = self._read_json(path)
+        raw_config = self._deep_merge(config_data, user_config)
 
         split = DatasetSplit(
             train_ratio=raw_config["split"]["train_ratio"],

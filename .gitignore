@@ -22,7 +22,10 @@ dist/
 
 # Runtime outputs
 runs/
-artifacts/
+artifacts/*
+!artifacts/splits/
+artifacts/splits/*
+!artifacts/splits/split_manifest.json
 checkpoints/
 logs/
 
