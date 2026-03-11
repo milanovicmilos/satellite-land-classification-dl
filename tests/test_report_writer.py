@@ -21,17 +21,42 @@ class JsonReportWriterTests(unittest.TestCase):
             macro_f1_score=0.8,
             precision={"A": 0.9},
             recall={"A": 0.8},
+            confusion_matrix=[[1]],
         )
 
         tmp_dir = Path(tempfile.mkdtemp())
         try:
             output_path = tmp_dir / "reports" / "baseline.json"
-            result = writer.write(summary, output_path.as_posix(), {"model_name": "baseline_cnn"})
+            result = writer.write(
+                summary,
+                output_path.as_posix(),
+                {
+                    "model_name": "baseline_cnn",
+                    "dataset_root": "data/EuroSAT",
+                    "split_seed": 42,
+                    "training_state": {
+                        "epoch_logs": [
+                            {
+                                "epoch": 1,
+                                "train_loss": 1.2,
+                                "val_loss": 1.1,
+                                "val_acc": 0.5,
+                                "val_f1": 0.4,
+                            }
+                        ]
+                    },
+                },
+            )
 
             self.assertTrue(Path(result).exists())
             content = Path(result).read_text(encoding="utf-8")
             self.assertIn('"accuracy": 0.9', content)
             self.assertIn('"model_name": "baseline_cnn"', content)
+
+            epoch_log_path = output_path.with_suffix(".training_log.tmp.json")
+            self.assertTrue(epoch_log_path.exists())
+            epoch_log_content = epoch_log_path.read_text(encoding="utf-8")
+            self.assertIn('"epoch": 1', epoch_log_content)
         finally:
             shutil.rmtree(tmp_dir)
 

@@ -67,6 +67,13 @@ class TrainingOrchestrator:
                 "dataset_root": config.dataset_root,
                 "split_seed": config.split.seed,
                 "checkpoint_path": checkpoint_path,
+                "hyperparameters": {
+                    "epochs": config.epochs,
+                    "batch_size": config.batch_size,
+                    "early_stopping_patience": config.early_stopping_patience,
+                    "learning_rate": training_state.get("learning_rate"),
+                },
+                "training_state": training_state,
             },
         )
 

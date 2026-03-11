@@ -31,6 +31,17 @@ class _FakeTrainer:
             "epochs_ran": 3,
             "best_validation_loss": 0.4,
             "patience": early_stopping_patience,
+            "learning_rate": 0.001,
+            "batch_size": 32,
+            "epoch_logs": [
+                {
+                    "epoch": 1,
+                    "train_loss": 1.2,
+                    "val_loss": 1.1,
+                    "val_acc": 0.5,
+                    "val_f1": 0.45,
+                }
+            ],
         }
 
 
@@ -57,7 +68,7 @@ class _FakeReportWriter:
     def write(self, summary, output_path: str, metadata: dict[str, object]) -> str:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text("report", encoding="utf-8")
+        path.write_text(str(metadata), encoding="utf-8")
         return path.as_posix()
 
 
@@ -99,6 +110,10 @@ class TrainingOrchestratorTests(unittest.TestCase):
             self.assertIn("checkpoint_path", result)
             self.assertIn("report_path", result)
             self.assertEqual(result["training_state"]["epochs_ran"], 3)
+
+            report_content = Path(result["report_path"]).read_text(encoding="utf-8")
+            self.assertIn("hyperparameters", report_content)
+            self.assertIn("epoch_logs", report_content)
         finally:
             shutil.rmtree(tmp_dir)
 

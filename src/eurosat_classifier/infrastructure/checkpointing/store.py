@@ -20,6 +20,13 @@ class JsonCheckpointStore:
 
         payload = {
             "model_path": checkpoint_path.as_posix(),
+            "hyperparameters": {
+                "learning_rate": training_state.get("learning_rate"),
+                "batch_size": training_state.get("batch_size"),
+                "epochs_requested": training_state.get("epochs_requested"),
+                "epochs_ran": training_state.get("epochs_ran"),
+                "early_stopping_patience": training_state.get("early_stopping_patience"),
+            },
             "training_state": training_state,
         }
         metadata_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")

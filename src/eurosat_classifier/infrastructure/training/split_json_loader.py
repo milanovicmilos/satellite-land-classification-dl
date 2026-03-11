@@ -15,6 +15,7 @@ class SplitJsonDataset(Dataset):
     def __init__(self, samples: list[dict[str, Any]], image_size: int = 64) -> None:
         self._samples = samples
         self._image_size = image_size
+        self.labels: list[int] = [int(sample["class_index"]) for sample in samples]
 
     def __len__(self) -> int:
         return len(self._samples)

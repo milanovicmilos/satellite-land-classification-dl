@@ -12,6 +12,7 @@ from PIL import Image
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from eurosat_classifier.infrastructure.checkpointing.store import JsonCheckpointStore
 from eurosat_classifier.infrastructure.evaluation.baseline_evaluator import BaselineEvaluator
 from eurosat_classifier.infrastructure.models.factory import SharedModelFactory
 from eurosat_classifier.infrastructure.training.baseline_trainer import BaselineTrainer
@@ -112,6 +113,32 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         self.assertIn("epochs_ran", state)
         self.assertGreaterEqual(summary.accuracy, 0.0)
         self.assertIsNotNone(summary.confusion_matrix)
+        self.assertIn("epoch_logs", state)
+        self.assertIn("best_validation_f1", state)
+
+    def test_checkpoint_metadata_contains_hyperparameters(self) -> None:
+        model = SharedModelFactory().create("baseline_cnn")
+        store = JsonCheckpointStore()
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            training_state = {
+                "learning_rate": 0.001,
+                "batch_size": 16,
+                "epochs_requested": 5,
+                "epochs_ran": 3,
+                "early_stopping_patience": 2,
+            }
+            checkpoint_path = store.save_best(model, training_state, tmp_dir.as_posix())
+
+            metadata_path = Path(checkpoint_path).with_suffix(".metadata.json")
+            metadata_content = metadata_path.read_text(encoding="utf-8")
+
+            self.assertIn('"hyperparameters"', metadata_content)
+            self.assertIn('"learning_rate": 0.001', metadata_content)
+            self.assertIn('"batch_size": 16', metadata_content)
+        finally:
+            shutil.rmtree(tmp_dir)
 
 
 if __name__ == "__main__":
