@@ -21,6 +21,7 @@ class JsonReportWriter:
                 "macro_f1_score": summary.macro_f1_score,
                 "precision": summary.precision,
                 "recall": summary.recall,
+                "confusion_matrix": summary.confusion_matrix,
             },
         }
 

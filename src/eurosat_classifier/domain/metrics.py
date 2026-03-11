@@ -11,3 +11,4 @@ class MetricSummary:
     macro_f1_score: float
     precision: dict[str, float]
     recall: dict[str, float]
+    confusion_matrix: list[list[int]] | None = None

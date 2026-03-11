@@ -97,15 +97,26 @@ Folders and files:
 - Planned: `src/eurosat_classifier/infrastructure/checkpointing/store.py`
 - Planned: `artifacts/reports/baseline_metrics.json`
 
+Implementation status (bootstrap, current branch):
+- `src/eurosat_classifier/infrastructure/models/baseline_cnn.py`
+- `src/eurosat_classifier/infrastructure/models/factory.py`
+- `src/eurosat_classifier/infrastructure/training/baseline_trainer.py`
+- `src/eurosat_classifier/infrastructure/evaluation/baseline_evaluator.py`
+- `src/eurosat_classifier/infrastructure/checkpointing/store.py`
+- `artifacts/reports/baseline_metrics.json` generated via CLI
+
+Next step for this phase:
+- Replace bootstrap baseline heuristic with an actual CNN training implementation while reusing the shared engine contracts.
+
 ## 4. Shared Training Engine And Evaluation Core
 
 Goal:
 - Avoid duplicated logic and keep architecture clean across baseline, EfficientNetB0, and ResNet50.
 
 Work items:
-- [ ] Define stable interfaces for model factory, dataloaders, trainer, evaluator, checkpoint store.
-- [ ] Centralize metric calculation and report serialization.
-- [ ] Keep framework-specific details in infrastructure layer only.
+- [x] Define stable interfaces for model factory, dataloaders, trainer, evaluator, checkpoint store.
+- [x] Centralize metric calculation and report serialization.
+- [x] Keep framework-specific details in infrastructure layer only.
 
 Folders and files:
 - Existing: `src/eurosat_classifier/application/contracts.py`
@@ -115,6 +126,15 @@ Folders and files:
 - Planned: `src/eurosat_classifier/application/services/training_orchestrator.py`
 - Planned: `src/eurosat_classifier/infrastructure/evaluation/report_writer.py`
 - Planned: `tests/test_metrics_calculator.py`
+
+Implementation status:
+- `src/eurosat_classifier/application/contracts.py` (shared engine protocols)
+- `src/eurosat_classifier/domain/metrics_calculator.py`
+- `src/eurosat_classifier/application/services/training_orchestrator.py`
+- `src/eurosat_classifier/infrastructure/evaluation/report_writer.py`
+- `tests/test_metrics_calculator.py`
+- `tests/test_report_writer.py`
+- `tests/test_training_orchestrator.py`
 
 ## 5. EfficientNetB0 Fine-Tuning (Milos Scope)
 

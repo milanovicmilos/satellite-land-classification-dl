@@ -66,5 +66,6 @@ class MetricsCalculator:
             macro_f1_score=macro_f1_score,
             precision=precision,
             recall=recall,
+            confusion_matrix=confusion_matrix,
         )
         return summary, confusion_matrix
