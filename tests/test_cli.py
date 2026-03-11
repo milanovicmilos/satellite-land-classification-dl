@@ -19,6 +19,14 @@ class CliTests(unittest.TestCase):
 
         self.assertTrue(parsed.dry_run)
         self.assertEqual(parsed.defaults, "configs/experiment.defaults.json")
+        self.assertEqual(parsed.splits_output, "artifacts/splits")
+
+    def test_build_parser_supports_prepare_dataset(self) -> None:
+        parser = build_parser()
+
+        parsed = parser.parse_args(["--prepare-dataset"])
+
+        self.assertTrue(parsed.prepare_dataset)
 
     def test_dry_run_training_runner_returns_json_payload(self) -> None:
         runner = DryRunTrainingRunner()

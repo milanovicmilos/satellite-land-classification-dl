@@ -36,6 +36,7 @@ The following commands are intended to work in the current scaffold.
 ```powershell
 c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m unittest discover -s tests
 $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --dry-run --config configs/baseline.example.json
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --prepare-dataset --config configs/baseline.example.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits
 ```
 
 ## Reproducibility Assets (Phase 1)
@@ -43,6 +44,11 @@ $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classificati
 - Canonical defaults: `configs/experiment.defaults.json`
 - Locked split manifest: `artifacts/splits/split_manifest.json`
 - Evaluation protocol and acceptance criteria: `docs/evaluation_protocol.md`
+- Deterministic split artifacts (generated):
+  - `artifacts/splits/train_split.json`
+  - `artifacts/splits/validation_split.json`
+  - `artifacts/splits/test_split.json`
+  - `artifacts/splits/split_summary.json`
 
 ## Notes
 
