@@ -41,21 +41,39 @@ Goal:
 - Ensure dataset integrity before training and produce deterministic train/val/test splits.
 
 Work items:
-- [ ] Implement dataset index builder from `data/EuroSAT` folder structure.
-- [ ] Add input validation (class presence, file count, extension checks, corrupt image detection).
-- [ ] Implement stratified split generator with fixed seed.
-- [ ] Save split files for reuse across all models.
+- [x] Implement dataset index builder from `data/EuroSAT` folder structure.
+- [x] Add input validation (class presence, file count, extension checks, corrupt image detection).
+- [x] Implement stratified split generator with fixed seed.
+- [x] Save split files for reuse across all models.
 
 Folders and files:
 - Existing: `data/EuroSAT`
 - Existing: `data/README.md`
 - Existing: `src/eurosat_classifier/domain/entities.py`
 - Existing: `src/eurosat_classifier/application/contracts.py`
+- Existing: `src/eurosat_classifier/application/use_cases.py`
 - Planned: `src/eurosat_classifier/infrastructure/datasets/eurosat_index.py`
 - Planned: `src/eurosat_classifier/infrastructure/datasets/splitter.py`
-- Planned: `src/eurosat_classifier/application/use_cases/prepare_dataset.py`
 - Planned: `tests/test_dataset_index.py`
 - Planned: `tests/test_splitter.py`
+
+Implementation status:
+- Completed in this phase:
+	- `src/eurosat_classifier/infrastructure/datasets/eurosat_index.py`
+	- `src/eurosat_classifier/infrastructure/datasets/splitter.py`
+	- `src/eurosat_classifier/infrastructure/datasets/split_store.py`
+	- `src/eurosat_classifier/application/contracts.py` (dataset prep contracts)
+	- `src/eurosat_classifier/application/use_cases.py` (`PrepareDataset` use case)
+	- `src/eurosat_classifier/entrypoints/cli.py` (`--prepare-dataset`, `--splits-output`)
+	- `tests/test_dataset_index.py`
+	- `tests/test_splitter.py`
+	- `tests/test_cli.py` updates for new CLI flags
+
+Produced artifacts:
+- `artifacts/splits/train_split.json`
+- `artifacts/splits/validation_split.json`
+- `artifacts/splits/test_split.json`
+- `artifacts/splits/split_summary.json`
 
 ## 3. Baseline CNN End-to-End (Reference System)
 
