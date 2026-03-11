@@ -132,7 +132,7 @@ Implementation status:
 - `src/eurosat_classifier/application/services/training_orchestrator.py`
 - `src/eurosat_classifier/infrastructure/evaluation/report_writer.py`
 - `src/eurosat_classifier/infrastructure/reproducibility.py` (`set_seed` for random, NumPy, Torch CPU/CUDA, deterministic cuDNN)
-- `src/eurosat_classifier/application/services/training_orchestrator.py` (global seed applied from config split seed)
+- `src/eurosat_classifier/application/services/training_orchestrator.py` (global seed applied from config split seed at the start of each run)
 - `src/eurosat_classifier/application/services/training_orchestrator.py` (CLI payload now includes confusion matrix for report parity)
 - `tests/test_metrics_calculator.py`
 - `tests/test_report_writer.py`
