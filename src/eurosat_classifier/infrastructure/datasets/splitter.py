@@ -32,6 +32,7 @@ class StratifiedSplitter:
                 len(class_samples),
                 split.train_ratio,
                 split.validation_ratio,
+                class_name,
             )
 
             train_end = train_count
@@ -53,6 +54,7 @@ class StratifiedSplitter:
         total_count: int,
         train_ratio: float,
         validation_ratio: float,
+        class_name: str,
     ) -> tuple[int, int, int]:
         train_count = int(total_count * train_ratio)
         validation_count = int(total_count * validation_ratio)
@@ -60,7 +62,8 @@ class StratifiedSplitter:
 
         if train_count == 0 or validation_count == 0 or test_count == 0:
             raise ValueError(
-                "Split configuration produced an empty split partition for one class."
+                f"Split configuration produced an empty partition for class '{class_name}' "
+                f"(total={total_count}, train={train_count}, validation={validation_count}, test={test_count})."
             )
 
         return train_count, validation_count, test_count

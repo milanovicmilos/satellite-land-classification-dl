@@ -81,7 +81,7 @@ class StratifiedSplitterTests(unittest.TestCase):
             self.assertTrue(Path(output["train"]).exists())
             self.assertTrue(Path(output["validation"]).exists())
             self.assertTrue(Path(output["test"]).exists())
-            self.assertTrue(Path(output["summary"]).exists())
+            self.assertTrue(Path(output["manifest"]).exists())
         finally:
             shutil.rmtree(tmp_dir)
 

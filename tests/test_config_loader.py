@@ -1,6 +1,8 @@
 """Tests for scaffold configuration loading."""
 
+import json
 from pathlib import Path
+import tempfile
 import sys
 import unittest
 
@@ -33,6 +35,32 @@ class JsonConfigLoaderTests(unittest.TestCase):
         self.assertEqual(config.dataset_root, "data/EuroSAT")
         self.assertEqual(config.batch_size, 32)
         self.assertEqual(config.split.seed, 42)
+
+    def test_load_user_config_overrides_defaults_including_nested_dicts(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        override_payload = {
+            "experiment_name": "override-check",
+            "model": {"name": "baseline_cnn"},
+            "training": {"batch_size": 8},
+            "split": {"seed": 99},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(override_payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertEqual(config.experiment_name, "override-check")
+        self.assertEqual(config.batch_size, 8)
+        self.assertEqual(config.split.seed, 99)
+        self.assertEqual(config.epochs, 25)
 
 
 if __name__ == "__main__":
