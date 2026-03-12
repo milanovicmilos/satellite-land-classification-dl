@@ -15,7 +15,7 @@ class EfficientNetB0Model(nn.Module):
     def __init__(
         self,
         num_classes: int = 10,
-        use_pretrained: bool = True,
+        use_pretrained: bool = False,
         freeze_backbone: bool = False,
     ) -> None:
         super().__init__()
@@ -31,12 +31,27 @@ class EfficientNetB0Model(nn.Module):
         if freeze_backbone:
             self.set_backbone_trainable(False)
 
+    def train(self, mode: bool = True):
+        """Keeps backbone BatchNorm layers in eval mode while the backbone is frozen."""
+
+        super().train(mode)
+        if self.backbone_frozen:
+            self._set_backbone_batchnorm_eval()
+        return self
+
+    def _set_backbone_batchnorm_eval(self) -> None:
+        for module in self.backbone.features.modules():
+            if isinstance(module, nn.modules.batchnorm._BatchNorm):
+                module.eval()
+
     def set_backbone_trainable(self, trainable: bool) -> None:
         """Freezes or unfreezes feature extractor parameters for staged training."""
 
         for parameter in self.backbone.features.parameters():
             parameter.requires_grad = trainable
         self.backbone_frozen = not trainable
+        if not trainable:
+            self._set_backbone_batchnorm_eval()
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         return self.backbone(inputs)
@@ -49,7 +64,7 @@ def build_efficientnet_b0_model(
     """Builds EfficientNetB0 with config-driven options for staged fine-tuning."""
 
     options = model_options or {}
-    use_pretrained = bool(options.get("use_pretrained", True))
+    use_pretrained = bool(options.get("use_pretrained", False))
     freeze_backbone = bool(options.get("freeze_backbone", False))
     return EfficientNetB0Model(
         use_pretrained=use_pretrained,

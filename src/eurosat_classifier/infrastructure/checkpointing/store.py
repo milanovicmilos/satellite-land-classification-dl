@@ -1,7 +1,6 @@
 """Checkpoint persistence for shared training engine."""
 
 import json
-from os import path
 from pathlib import Path
 
 import torch
@@ -12,13 +11,14 @@ class JsonCheckpointStore:
 
     @staticmethod
     def load_checkpoint(model, checkpoint_path: str) -> None:
-        if not path.exists(checkpoint_path):
+        checkpoint = Path(checkpoint_path)
+        if not checkpoint.exists():
             raise FileNotFoundError(
                 "Checkpoint file not found for resume operation: "
                 f"{checkpoint_path}"
             )
 
-        state_dict = torch.load(checkpoint_path, map_location="cpu")
+        state_dict = torch.load(checkpoint.as_posix(), map_location="cpu", weights_only=True)
         try:
             model.load_state_dict(state_dict)
         except RuntimeError as exc:

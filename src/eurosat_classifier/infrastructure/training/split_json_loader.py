@@ -26,6 +26,16 @@ class SplitJsonDataset(Dataset):
         self._image_size = image_size
         self._normalize_mean = normalize_mean
         self._normalize_std = normalize_std
+        self._normalize_mean_tensor = (
+            torch.tensor(normalize_mean, dtype=torch.float32).view(3, 1, 1)
+            if normalize_mean is not None
+            else None
+        )
+        self._normalize_std_tensor = (
+            torch.tensor(normalize_std, dtype=torch.float32).view(3, 1, 1)
+            if normalize_std is not None
+            else None
+        )
         self.labels: list[int] = [int(sample["class_index"]) for sample in samples]
 
     def __len__(self) -> int:
@@ -44,10 +54,8 @@ class SplitJsonDataset(Dataset):
             image_array = np.array(image, copy=True)
             image_tensor = torch.from_numpy(image_array).permute(2, 0, 1).to(dtype=torch.float32) / 255.0
 
-            if self._normalize_mean is not None and self._normalize_std is not None:
-                mean = torch.tensor(self._normalize_mean, dtype=torch.float32).view(3, 1, 1)
-                std = torch.tensor(self._normalize_std, dtype=torch.float32).view(3, 1, 1)
-                image_tensor = (image_tensor - mean) / std
+            if self._normalize_mean_tensor is not None and self._normalize_std_tensor is not None:
+                image_tensor = (image_tensor - self._normalize_mean_tensor) / self._normalize_std_tensor
 
         label_tensor = torch.tensor(class_index, dtype=torch.long)
         return image_tensor, label_tensor

@@ -156,8 +156,8 @@ Folders and files:
 - Existing: `src/eurosat_classifier/infrastructure/models/efficientnet_b0.py`
 - Existing: `configs/efficientnet_b0.stage1.json`
 - Existing: `configs/efficientnet_b0.stage2.json`
-- Planned: `artifacts/reports/efficientnet_b0_metrics.json`
-- Planned: `artifacts/reports/baseline_vs_efficientnet_b0.md`
+- Existing: `artifacts/reports/efficientnet_b0_metrics.json`
+- Existing: `artifacts/reports/baseline_vs_efficientnet_b0.md`
 
 Implementation status:
 - `src/eurosat_classifier/infrastructure/models/efficientnet_b0.py` (pretrained EfficientNetB0 adapter with freeze/unfreeze support)
