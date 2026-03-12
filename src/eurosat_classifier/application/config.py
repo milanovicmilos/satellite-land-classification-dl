@@ -17,6 +17,7 @@ class TrainingConfig:
     batch_size: int
     early_stopping_patience: int
     split: DatasetSplit
+    resume_from: str | None = None
     model_options: dict[str, object] = field(default_factory=dict)
 
     def to_experiment(self) -> Experiment:

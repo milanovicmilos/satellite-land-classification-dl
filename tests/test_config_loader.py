@@ -74,6 +74,20 @@ class JsonConfigLoaderTests(unittest.TestCase):
         self.assertTrue(bool(config.model_options.get("freeze_backbone")))
         self.assertTrue(bool(config.model_options.get("use_pretrained")))
 
+    def test_load_reads_stage2_resume_from_path(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage2.json"))
+
+        self.assertEqual(config.model_name, "efficientnet_b0")
+        self.assertFalse(bool(config.model_options.get("freeze_backbone")))
+        self.assertEqual(
+            config.resume_from,
+            "checkpoints/efficientnet_b0/stage1/best_checkpoint.pt",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

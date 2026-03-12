@@ -53,5 +53,6 @@ class JsonConfigLoader:
             batch_size=raw_config["training"]["batch_size"],
             early_stopping_patience=raw_config["training"]["early_stopping_patience"],
             split=split,
+            resume_from=raw_config["training"].get("resume_from"),
             model_options=raw_config["model"].get("options", {}),
         )

@@ -9,6 +9,11 @@ import torch
 class JsonCheckpointStore:
     """Stores baseline model state and training metadata."""
 
+    @staticmethod
+    def load_checkpoint(model, checkpoint_path: str) -> None:
+        state_dict = torch.load(checkpoint_path, map_location="cpu")
+        model.load_state_dict(state_dict)
+
     def save_best(self, model, training_state: dict[str, object], output_dir: str) -> str:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)

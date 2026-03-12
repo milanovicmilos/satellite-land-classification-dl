@@ -84,6 +84,9 @@ class Evaluator(Protocol):
 class CheckpointStore(Protocol):
     """Stores the best model checkpoint and returns output path."""
 
+    def load_checkpoint(self, model: Any, checkpoint_path: str) -> None:
+        ...
+
     def save_best(self, model: Any, training_state: dict[str, Any], output_dir: str) -> str:
         ...
 

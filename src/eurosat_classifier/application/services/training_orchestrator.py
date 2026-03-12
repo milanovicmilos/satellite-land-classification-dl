@@ -44,6 +44,9 @@ class TrainingOrchestrator:
         set_seed(config.split.seed)
 
         model = self._model_factory.create(config.model_name, config.model_options)
+        if config.resume_from:
+            self._checkpoint_store.load_checkpoint(model, config.resume_from)
+
         loaders = self._data_loader_factory.create(
             split_artifacts,
             config.batch_size,
