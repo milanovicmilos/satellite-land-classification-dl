@@ -8,12 +8,16 @@ import tempfile
 import unittest
 
 from PIL import Image
+import torch
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from eurosat_classifier.infrastructure.checkpointing.store import JsonCheckpointStore
+from eurosat_classifier.infrastructure.config_loader import JsonConfigLoader
 from eurosat_classifier.infrastructure.evaluation.baseline_evaluator import BaselineEvaluator
+from eurosat_classifier.infrastructure.evaluation.report_writer import JsonReportWriter
+from eurosat_classifier.application.services.training_orchestrator import TrainingOrchestrator
 from eurosat_classifier.infrastructure.models.factory import SharedModelFactory
 from eurosat_classifier.infrastructure.training.baseline_trainer import BaselineTrainer
 from eurosat_classifier.infrastructure.training.split_json_loader import SplitJsonLoaderFactory
@@ -31,6 +35,28 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         model = factory.create("baseline_cnn")
 
         self.assertEqual(model.num_classes, 10)
+
+    def test_model_factory_creates_efficientnet_model(self) -> None:
+        factory = SharedModelFactory()
+
+        model = factory.create("efficientnet_b0")
+
+        self.assertEqual(model.num_classes, 10)
+
+    def test_efficientnet_forward_shape_and_backbone_freeze_controls(self) -> None:
+        model = SharedModelFactory().create("efficientnet_b0")
+
+        model.set_backbone_trainable(False)
+        self.assertTrue(model.backbone_frozen)
+        self.assertTrue(all(not p.requires_grad for p in model.backbone.features.parameters()))
+
+        model.set_backbone_trainable(True)
+        self.assertFalse(model.backbone_frozen)
+        self.assertTrue(all(p.requires_grad for p in model.backbone.features.parameters()))
+
+        inputs = torch.zeros((2, 3, 64, 64), dtype=torch.float32)
+        outputs = model(inputs)
+        self.assertEqual(tuple(outputs.shape), (2, 10))
 
     def test_split_loader_reads_json_files(self) -> None:
         tmp_dir = Path(tempfile.mkdtemp())
@@ -72,6 +98,80 @@ class BaselineEngineComponentsTests(unittest.TestCase):
             self.assertEqual(len(loaders["train"]), 1)
             self.assertEqual(len(loaders["validation"]), 1)
             self.assertEqual(len(loaders["test"]), 1)
+        finally:
+            shutil.rmtree(tmp_dir)
+
+    def test_split_loader_applies_imagenet_normalization_only_for_efficientnet(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train = tmp_dir / "train_split.json"
+            validation = tmp_dir / "validation_split.json"
+            test = tmp_dir / "test_split.json"
+
+            image_path = tmp_dir / "sample.jpg"
+            image = Image.new("RGB", (64, 64), (255, 255, 255))
+            image.save(image_path.as_posix(), format="JPEG")
+
+            payload = json.dumps([{"path": image_path.as_posix(), "class_index": 0}])
+            train.write_text(payload, encoding="utf-8")
+            validation.write_text(payload, encoding="utf-8")
+            test.write_text(payload, encoding="utf-8")
+
+            split_paths = {
+                "train": train.as_posix(),
+                "validation": validation.as_posix(),
+                "test": test.as_posix(),
+            }
+
+            baseline_loaders = SplitJsonLoaderFactory().create(
+                split_paths,
+                batch_size=1,
+                model_name="baseline_cnn",
+            )
+            efficientnet_loaders = SplitJsonLoaderFactory().create(
+                split_paths,
+                batch_size=1,
+                model_name="efficientnet_b0",
+            )
+
+            baseline_inputs, _ = next(iter(baseline_loaders["train"]))
+            efficientnet_inputs, _ = next(iter(efficientnet_loaders["train"]))
+
+            self.assertAlmostEqual(float(baseline_inputs[0, 0, 0, 0]), 1.0, places=3)
+            self.assertGreater(float(efficientnet_inputs[0, 0, 0, 0]), 2.0)
+        finally:
+            shutil.rmtree(tmp_dir)
+
+    def test_split_loader_uses_registry_normalization_for_future_models(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train = tmp_dir / "train_split.json"
+            validation = tmp_dir / "validation_split.json"
+            test = tmp_dir / "test_split.json"
+
+            image_path = tmp_dir / "sample.jpg"
+            image = Image.new("RGB", (64, 64), (255, 255, 255))
+            image.save(image_path.as_posix(), format="JPEG")
+
+            payload = json.dumps([{"path": image_path.as_posix(), "class_index": 0}])
+            train.write_text(payload, encoding="utf-8")
+            validation.write_text(payload, encoding="utf-8")
+            test.write_text(payload, encoding="utf-8")
+
+            split_paths = {
+                "train": train.as_posix(),
+                "validation": validation.as_posix(),
+                "test": test.as_posix(),
+            }
+
+            resnet_loaders = SplitJsonLoaderFactory().create(
+                split_paths,
+                batch_size=1,
+                model_name="resnet50",
+            )
+
+            resnet_inputs, _ = next(iter(resnet_loaders["train"]))
+            self.assertGreater(float(resnet_inputs[0, 0, 0, 0]), 2.0)
         finally:
             shutil.rmtree(tmp_dir)
 
@@ -139,6 +239,78 @@ class BaselineEngineComponentsTests(unittest.TestCase):
             self.assertIn('"batch_size": 16', metadata_content)
         finally:
             shutil.rmtree(tmp_dir)
+
+    def test_load_checkpoint_raises_clear_error_for_missing_file(self) -> None:
+        model = SharedModelFactory().create("baseline_cnn")
+        store = JsonCheckpointStore()
+
+        with self.assertRaises(FileNotFoundError) as context:
+            store.load_checkpoint(model, "checkpoints/nonexistent/best_checkpoint.pt")
+
+        self.assertIn("Checkpoint file not found", str(context.exception))
+
+    def test_load_checkpoint_raises_clear_error_for_incompatible_architecture(self) -> None:
+        store = JsonCheckpointStore()
+        source_model = SharedModelFactory().create("baseline_cnn")
+        target_model = SharedModelFactory().create("efficientnet_b0")
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            checkpoint_path = tmp_dir / "incompatible_checkpoint.pt"
+            torch.save(source_model.state_dict(), checkpoint_path.as_posix())
+
+            with self.assertRaises(RuntimeError) as context:
+                store.load_checkpoint(target_model, checkpoint_path.as_posix())
+
+            self.assertIn("Checkpoint incompatibility", str(context.exception))
+        finally:
+            shutil.rmtree(tmp_dir)
+
+    def test_efficientnet_stage1_smoke_runs_one_epoch(self) -> None:
+        config = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        ).load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.json"))
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train_split = tmp_dir / "train_split.json"
+            validation_split = tmp_dir / "validation_split.json"
+            test_split = tmp_dir / "test_split.json"
+
+            samples: list[dict[str, object]] = []
+            for idx in range(6):
+                image_path = tmp_dir / f"eff_sample_{idx}.jpg"
+                self._create_image(image_path)
+                samples.append({"path": image_path.as_posix(), "class_index": idx % 3})
+
+            train_split.write_text(json.dumps(samples[:4]), encoding="utf-8")
+            validation_split.write_text(json.dumps(samples[4:5]), encoding="utf-8")
+            test_split.write_text(json.dumps(samples[3:6]), encoding="utf-8")
+
+            orchestrator = TrainingOrchestrator(
+                model_factory=SharedModelFactory(),
+                data_loader_factory=SplitJsonLoaderFactory(),
+                trainer=BaselineTrainer(),
+                evaluator=BaselineEvaluator([f"Class{i}" for i in range(10)]),
+                checkpoint_store=JsonCheckpointStore(),
+                report_writer=JsonReportWriter(),
+            )
+
+            result = orchestrator.run(
+                config=config,
+                split_artifacts={
+                    "train": train_split.as_posix(),
+                    "validation": validation_split.as_posix(),
+                    "test": test_split.as_posix(),
+                },
+                output_dir=(tmp_dir / "checkpoints").as_posix(),
+                report_output_path=(tmp_dir / "reports" / "efficientnet_stage1_smoke.json").as_posix(),
+            )
+        finally:
+            shutil.rmtree(tmp_dir)
+
+        self.assertIn("accuracy", result)
+        self.assertEqual(result["training_state"]["epochs_requested"], 1)
 
 
 if __name__ == "__main__":

@@ -45,14 +45,19 @@ class SplitPersistence(Protocol):
 class ModelFactory(Protocol):
     """Builds model instances by model name."""
 
-    def create(self, model_name: str) -> Any:
+    def create(self, model_name: str, model_options: dict[str, Any] | None = None) -> Any:
         ...
 
 
 class DataLoaderFactory(Protocol):
     """Creates train/validation/test loaders from split artifact files."""
 
-    def create(self, split_artifacts: dict[str, str], batch_size: int) -> dict[str, Any]:
+    def create(
+        self,
+        split_artifacts: dict[str, str],
+        batch_size: int,
+        model_name: str | None = None,
+    ) -> dict[str, Any]:
         ...
 
 
@@ -78,6 +83,9 @@ class Evaluator(Protocol):
 
 class CheckpointStore(Protocol):
     """Stores the best model checkpoint and returns output path."""
+
+    def load_checkpoint(self, model: Any, checkpoint_path: str) -> None:
+        ...
 
     def save_best(self, model: Any, training_state: dict[str, Any], output_dir: str) -> str:
         ...

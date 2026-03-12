@@ -9,6 +9,23 @@ import torch
 class JsonCheckpointStore:
     """Stores baseline model state and training metadata."""
 
+    @staticmethod
+    def load_checkpoint(model, checkpoint_path: str) -> None:
+        checkpoint = Path(checkpoint_path)
+        if not checkpoint.exists():
+            raise FileNotFoundError(
+                "Checkpoint file not found for resume operation: "
+                f"{checkpoint_path}"
+            )
+
+        state_dict = torch.load(checkpoint.as_posix(), map_location="cpu", weights_only=True)
+        try:
+            model.load_state_dict(state_dict)
+        except RuntimeError as exc:
+            raise RuntimeError(
+                "Checkpoint incompatibility: Attempting to load weights into a different model architecture."
+            ) from exc
+
     def save_best(self, model, training_state: dict[str, object], output_dir: str) -> str:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)

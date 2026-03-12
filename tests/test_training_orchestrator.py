@@ -16,12 +16,17 @@ from eurosat_classifier.domain.metrics import MetricSummary
 
 
 class _FakeModelFactory:
-    def create(self, model_name: str):
+    def create(self, model_name: str, model_options: dict[str, object] | None = None):
         return {"model": model_name}
 
 
 class _FakeDataLoaderFactory:
-    def create(self, split_artifacts: dict[str, str], batch_size: int) -> dict[str, object]:
+    def create(
+        self,
+        split_artifacts: dict[str, str],
+        batch_size: int,
+        model_name: str | None = None,
+    ) -> dict[str, object]:
         return {"train": [1], "validation": [2], "test": [3]}
 
 
@@ -57,6 +62,10 @@ class _FakeEvaluator:
 
 
 class _FakeCheckpointStore:
+    def load_checkpoint(self, model, checkpoint_path: str) -> None:
+        if isinstance(model, dict):
+            model["loaded_from"] = checkpoint_path
+
     def save_best(self, model, training_state: dict[str, object], output_dir: str) -> str:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
@@ -118,6 +127,91 @@ class TrainingOrchestratorTests(unittest.TestCase):
             self.assertIn("epoch_logs", report_content)
         finally:
             shutil.rmtree(tmp_dir)
+
+    def test_resume_checkpoint_is_loaded_before_training(self) -> None:
+        class _ResumeAwareTrainer:
+            def train(self, model, loaders, epochs: int, early_stopping_patience: int):
+                loaded_from = model.get("loaded_from", "")
+                if not loaded_from.replace("\\", "/").endswith("/stage1/best_checkpoint.pt"):
+                    raise AssertionError("Checkpoint must be loaded before training starts.")
+                return {
+                    "epochs_ran": 1,
+                    "best_validation_loss": 0.1,
+                    "learning_rate": 0.001,
+                    "batch_size": 8,
+                    "epoch_logs": [],
+                }
+
+        orchestrator = TrainingOrchestrator(
+            model_factory=_FakeModelFactory(),
+            data_loader_factory=_FakeDataLoaderFactory(),
+            trainer=_ResumeAwareTrainer(),
+            evaluator=_FakeEvaluator(),
+            checkpoint_store=_FakeCheckpointStore(),
+            report_writer=_FakeReportWriter(),
+        )
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            resume_path = tmp_dir / "stage1" / "best_checkpoint.pt"
+            resume_path.parent.mkdir(parents=True, exist_ok=True)
+            resume_path.write_text("dummy", encoding="utf-8")
+
+            config = TrainingConfig(
+                experiment_name="efficientnet-stage2",
+                dataset_root="data/EuroSAT",
+                model_name="efficientnet_b0",
+                epochs=1,
+                batch_size=8,
+                early_stopping_patience=1,
+                split=DatasetSplit(0.7, 0.15, 0.15, 42),
+                resume_from=resume_path.as_posix(),
+                model_options={"freeze_backbone": False},
+            )
+
+            result = orchestrator.run(
+                config=config,
+                split_artifacts={"train": "t.json", "validation": "v.json", "test": "x.json"},
+                output_dir=(tmp_dir / "checkpoints").as_posix(),
+                report_output_path=(tmp_dir / "reports" / "stage2_metrics.json").as_posix(),
+            )
+            self.assertIn("accuracy", result)
+        finally:
+            shutil.rmtree(tmp_dir)
+
+    def test_missing_resume_checkpoint_fails_before_model_initialization(self) -> None:
+        class _FailIfModelCreatedFactory:
+            def create(self, model_name: str, model_options: dict[str, object] | None = None):
+                raise AssertionError("Model must not be created when resume checkpoint is missing.")
+
+        orchestrator = TrainingOrchestrator(
+            model_factory=_FailIfModelCreatedFactory(),
+            data_loader_factory=_FakeDataLoaderFactory(),
+            trainer=_FakeTrainer(),
+            evaluator=_FakeEvaluator(),
+            checkpoint_store=_FakeCheckpointStore(),
+            report_writer=_FakeReportWriter(),
+        )
+
+        config = TrainingConfig(
+            experiment_name="invalid-resume",
+            dataset_root="data/EuroSAT",
+            model_name="efficientnet_b0",
+            epochs=1,
+            batch_size=8,
+            early_stopping_patience=1,
+            split=DatasetSplit(0.7, 0.15, 0.15, 42),
+            resume_from="checkpoints/does-not-exist.pt",
+            model_options={"freeze_backbone": False},
+        )
+
+        with self.assertRaises(FileNotFoundError):
+            orchestrator.run(
+                config=config,
+                split_artifacts={"train": "t.json", "validation": "v.json", "test": "x.json"},
+                output_dir="tmp/checkpoints",
+                report_output_path="tmp/report.json",
+            )
 
 
 if __name__ == "__main__":
