@@ -148,7 +148,7 @@ Work items:
 - [x] Add EfficientNetB0 model adapter/factory implementation.
 - [x] Add staged fine-tuning strategy (frozen backbone -> progressive unfreeze).
 - [x] Add model-specific config presets.
-- [ ] Generate comparison report versus baseline.
+- [x] Generate comparison report versus baseline.
 
 Folders and files:
 - Existing: `src/eurosat_classifier/infrastructure/models/registry.py`
@@ -162,9 +162,11 @@ Folders and files:
 Implementation status:
 - `src/eurosat_classifier/infrastructure/models/efficientnet_b0.py` (pretrained EfficientNetB0 adapter with freeze/unfreeze support)
 - `src/eurosat_classifier/infrastructure/models/registry.py` + `src/eurosat_classifier/infrastructure/models/factory.py` (registry-driven model resolution)
-- `src/eurosat_classifier/infrastructure/training/split_json_loader.py` (ImageNet normalization applied only for EfficientNet)
+- `src/eurosat_classifier/infrastructure/training/split_json_loader.py` + `src/eurosat_classifier/infrastructure/models/registry.py` (registry-driven normalization profiles for model families)
 - `configs/efficientnet_b0.stage1.json` (frozen backbone stage)
 - `configs/efficientnet_b0.stage2.json` (unfrozen stage with checkpoint resume path)
+- `artifacts/reports/efficientnet_b0_metrics.json` (Phase 5 placeholder artifact)
+- `artifacts/reports/baseline_vs_efficientnet_b0.md` (Phase 5 comparison placeholder)
 
 ## 6. ResNet50 Integration Boundary (Bojan Scope)
 
@@ -238,9 +240,9 @@ Folders and files:
 
 ## Current Phase Recommendation
 
-Start with Phase 5.
+Start with Phase 7.
 
 Reason:
-- Phases 1, 2, 3, and 4 are completed and validated.
-- Reproducibility and CLI/report consistency are now enforced in the shared engine.
-- Phase 5 delivers your owned advanced model (EfficientNetB0) on top of stable shared infrastructure.
+- Phases 1, 2, 3, 4, and 5 are completed and synchronized in this roadmap.
+- Shared engine robustness for resume and checkpoint compatibility has dedicated tests.
+- Next highest value is expanding quality gates (tests, lint, type checks) before broader integration work.
