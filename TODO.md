@@ -73,7 +73,7 @@ Produced artifacts:
 - `artifacts/splits/train_split.json`
 - `artifacts/splits/validation_split.json`
 - `artifacts/splits/test_split.json`
-- `artifacts/splits/split_summary.json`
+- `artifacts/splits/split_manifest.json`
 
 ## 3. Baseline CNN End-to-End (Reference System)
 
@@ -145,19 +145,26 @@ Goal:
 - Implement and tune EfficientNetB0 using the shared engine and compare against baseline.
 
 Work items:
-- [ ] Add EfficientNetB0 model adapter/factory implementation.
-- [ ] Add staged fine-tuning strategy (frozen backbone -> progressive unfreeze).
-- [ ] Add model-specific config presets.
+- [x] Add EfficientNetB0 model adapter/factory implementation.
+- [x] Add staged fine-tuning strategy (frozen backbone -> progressive unfreeze).
+- [x] Add model-specific config presets.
 - [ ] Generate comparison report versus baseline.
 
 Folders and files:
 - Existing: `src/eurosat_classifier/infrastructure/models/registry.py`
 - Existing: `configs/baseline.example.json`
-- Planned: `src/eurosat_classifier/infrastructure/models/efficientnet_b0.py`
-- Planned: `configs/efficientnet_b0.stage1.json`
-- Planned: `configs/efficientnet_b0.stage2.json`
+- Existing: `src/eurosat_classifier/infrastructure/models/efficientnet_b0.py`
+- Existing: `configs/efficientnet_b0.stage1.json`
+- Existing: `configs/efficientnet_b0.stage2.json`
 - Planned: `artifacts/reports/efficientnet_b0_metrics.json`
 - Planned: `artifacts/reports/baseline_vs_efficientnet_b0.md`
+
+Implementation status:
+- `src/eurosat_classifier/infrastructure/models/efficientnet_b0.py` (pretrained EfficientNetB0 adapter with freeze/unfreeze support)
+- `src/eurosat_classifier/infrastructure/models/registry.py` + `src/eurosat_classifier/infrastructure/models/factory.py` (registry-driven model resolution)
+- `src/eurosat_classifier/infrastructure/training/split_json_loader.py` (ImageNet normalization applied only for EfficientNet)
+- `configs/efficientnet_b0.stage1.json` (frozen backbone stage)
+- `configs/efficientnet_b0.stage2.json` (unfrozen stage with checkpoint resume path)
 
 ## 6. ResNet50 Integration Boundary (Bojan Scope)
 
