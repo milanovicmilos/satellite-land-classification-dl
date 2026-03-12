@@ -16,7 +16,7 @@ from eurosat_classifier.domain.metrics import MetricSummary
 
 
 class _FakeModelFactory:
-    def create(self, model_name: str):
+    def create(self, model_name: str, model_options: dict[str, object] | None = None):
         return {"model": model_name}
 
 

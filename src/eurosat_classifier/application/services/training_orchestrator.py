@@ -43,7 +43,7 @@ class TrainingOrchestrator:
     ) -> dict[str, Any]:
         set_seed(config.split.seed)
 
-        model = self._model_factory.create(config.model_name)
+        model = self._model_factory.create(config.model_name, config.model_options)
         loaders = self._data_loader_factory.create(
             split_artifacts,
             config.batch_size,

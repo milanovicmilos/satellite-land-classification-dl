@@ -1,5 +1,6 @@
 """Application configuration objects."""
 
+from dataclasses import field
 from dataclasses import dataclass
 
 from eurosat_classifier.domain.entities import DatasetSplit, Experiment
@@ -16,6 +17,7 @@ class TrainingConfig:
     batch_size: int
     early_stopping_patience: int
     split: DatasetSplit
+    model_options: dict[str, object] = field(default_factory=dict)
 
     def to_experiment(self) -> Experiment:
         self.split.validate()

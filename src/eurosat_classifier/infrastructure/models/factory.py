@@ -7,12 +7,19 @@ from eurosat_classifier.infrastructure.models.efficientnet_b0 import EfficientNe
 class SharedModelFactory:
     """Creates model instances supported by the shared training engine."""
 
-    def create(self, model_name: str):
+    def create(self, model_name: str, model_options: dict[str, object] | None = None):
+        options = model_options or {}
+
         if model_name == "baseline_cnn":
             return BaselineCnnModel()
 
         if model_name == "efficientnet_b0":
-            return EfficientNetB0Model(use_pretrained=True, freeze_backbone=False)
+            use_pretrained = bool(options.get("use_pretrained", True))
+            freeze_backbone = bool(options.get("freeze_backbone", False))
+            return EfficientNetB0Model(
+                use_pretrained=use_pretrained,
+                freeze_backbone=freeze_backbone,
+            )
 
         if model_name == "resnet50":
             raise NotImplementedError(

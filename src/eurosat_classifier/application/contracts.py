@@ -45,7 +45,7 @@ class SplitPersistence(Protocol):
 class ModelFactory(Protocol):
     """Builds model instances by model name."""
 
-    def create(self, model_name: str) -> Any:
+    def create(self, model_name: str, model_options: dict[str, Any] | None = None) -> Any:
         ...
 
 
