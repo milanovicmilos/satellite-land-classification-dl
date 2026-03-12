@@ -249,6 +249,23 @@ class BaselineEngineComponentsTests(unittest.TestCase):
 
         self.assertIn("Checkpoint file not found", str(context.exception))
 
+    def test_load_checkpoint_raises_clear_error_for_incompatible_architecture(self) -> None:
+        store = JsonCheckpointStore()
+        source_model = SharedModelFactory().create("baseline_cnn")
+        target_model = SharedModelFactory().create("efficientnet_b0")
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            checkpoint_path = tmp_dir / "incompatible_checkpoint.pt"
+            torch.save(source_model.state_dict(), checkpoint_path.as_posix())
+
+            with self.assertRaises(RuntimeError) as context:
+                store.load_checkpoint(target_model, checkpoint_path.as_posix())
+
+            self.assertIn("Checkpoint incompatibility", str(context.exception))
+        finally:
+            shutil.rmtree(tmp_dir)
+
     def test_efficientnet_stage1_smoke_runs_one_epoch(self) -> None:
         config = JsonConfigLoader(
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
