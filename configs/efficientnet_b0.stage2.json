@@ -17,7 +17,7 @@
   "model": {
     "name": "efficientnet_b0",
     "options": {
-      "use_pretrained": true,
+      "use_pretrained": false,
       "freeze_backbone": false
     }
   }
