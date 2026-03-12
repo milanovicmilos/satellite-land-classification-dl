@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 from PIL import Image
+import torch
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
@@ -31,6 +32,28 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         model = factory.create("baseline_cnn")
 
         self.assertEqual(model.num_classes, 10)
+
+    def test_model_factory_creates_efficientnet_model(self) -> None:
+        factory = SharedModelFactory()
+
+        model = factory.create("efficientnet_b0")
+
+        self.assertEqual(model.num_classes, 10)
+
+    def test_efficientnet_forward_shape_and_backbone_freeze_controls(self) -> None:
+        model = SharedModelFactory().create("efficientnet_b0")
+
+        model.set_backbone_trainable(False)
+        self.assertTrue(model.backbone_frozen)
+        self.assertTrue(all(not p.requires_grad for p in model.backbone.features.parameters()))
+
+        model.set_backbone_trainable(True)
+        self.assertFalse(model.backbone_frozen)
+        self.assertTrue(all(p.requires_grad for p in model.backbone.features.parameters()))
+
+        inputs = torch.zeros((2, 3, 64, 64), dtype=torch.float32)
+        outputs = model(inputs)
+        self.assertEqual(tuple(outputs.shape), (2, 10))
 
     def test_split_loader_reads_json_files(self) -> None:
         tmp_dir = Path(tempfile.mkdtemp())

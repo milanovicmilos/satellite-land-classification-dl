@@ -1,6 +1,7 @@
 """Shared model factory implementations."""
 
 from eurosat_classifier.infrastructure.models.baseline_cnn import BaselineCnnModel
+from eurosat_classifier.infrastructure.models.efficientnet_b0 import EfficientNetB0Model
 
 
 class SharedModelFactory:
@@ -11,9 +12,7 @@ class SharedModelFactory:
             return BaselineCnnModel()
 
         if model_name == "efficientnet_b0":
-            raise NotImplementedError(
-                "EfficientNetB0 implementation belongs to Milos and is scheduled for phase 5."
-            )
+            return EfficientNetB0Model(use_pretrained=True, freeze_backbone=False)
 
         if model_name == "resnet50":
             raise NotImplementedError(
