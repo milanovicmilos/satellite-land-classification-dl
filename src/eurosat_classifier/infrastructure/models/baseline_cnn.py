@@ -3,6 +3,8 @@
 import torch
 from torch import nn
 
+from eurosat_classifier.infrastructure.models.registry import register_model
+
 
 class BaselineCnnModel(nn.Module):
     """Simple CNN trained from scratch as the project baseline."""
@@ -37,3 +39,10 @@ class BaselineCnnModel(nn.Module):
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         features = self.features(inputs)
         return self.classifier(features)
+
+
+@register_model("baseline_cnn")
+def build_baseline_cnn_model(model_options: dict[str, object] | None = None) -> BaselineCnnModel:
+    """Builds baseline model; options are accepted for factory signature consistency."""
+
+    return BaselineCnnModel()

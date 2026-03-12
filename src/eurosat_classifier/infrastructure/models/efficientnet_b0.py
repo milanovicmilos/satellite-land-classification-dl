@@ -6,6 +6,8 @@ import torch
 from torch import nn
 from torchvision.models import EfficientNet_B0_Weights, efficientnet_b0
 
+from eurosat_classifier.infrastructure.models.registry import register_model
+
 
 class EfficientNetB0Model(nn.Module):
     """EfficientNetB0 model with optional backbone freezing for staged fine-tuning."""
@@ -38,3 +40,18 @@ class EfficientNetB0Model(nn.Module):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         return self.backbone(inputs)
+
+
+@register_model("efficientnet_b0")
+def build_efficientnet_b0_model(
+    model_options: dict[str, object] | None = None,
+) -> EfficientNetB0Model:
+    """Builds EfficientNetB0 with config-driven options for staged fine-tuning."""
+
+    options = model_options or {}
+    use_pretrained = bool(options.get("use_pretrained", True))
+    freeze_backbone = bool(options.get("freeze_backbone", False))
+    return EfficientNetB0Model(
+        use_pretrained=use_pretrained,
+        freeze_backbone=freeze_backbone,
+    )
