@@ -21,7 +21,12 @@ class _FakeModelFactory:
 
 
 class _FakeDataLoaderFactory:
-    def create(self, split_artifacts: dict[str, str], batch_size: int) -> dict[str, object]:
+    def create(
+        self,
+        split_artifacts: dict[str, str],
+        batch_size: int,
+        model_name: str | None = None,
+    ) -> dict[str, object]:
         return {"train": [1], "validation": [2], "test": [3]}
 
 

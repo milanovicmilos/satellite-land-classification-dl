@@ -44,7 +44,11 @@ class TrainingOrchestrator:
         set_seed(config.split.seed)
 
         model = self._model_factory.create(config.model_name)
-        loaders = self._data_loader_factory.create(split_artifacts, config.batch_size)
+        loaders = self._data_loader_factory.create(
+            split_artifacts,
+            config.batch_size,
+            model_name=config.model_name,
+        )
 
         training_state = self._trainer.train(
             model=model,

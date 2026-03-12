@@ -52,7 +52,12 @@ class ModelFactory(Protocol):
 class DataLoaderFactory(Protocol):
     """Creates train/validation/test loaders from split artifact files."""
 
-    def create(self, split_artifacts: dict[str, str], batch_size: int) -> dict[str, Any]:
+    def create(
+        self,
+        split_artifacts: dict[str, str],
+        batch_size: int,
+        model_name: str | None = None,
+    ) -> dict[str, Any]:
         ...
 
 

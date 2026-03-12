@@ -98,6 +98,47 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         finally:
             shutil.rmtree(tmp_dir)
 
+    def test_split_loader_applies_imagenet_normalization_only_for_efficientnet(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train = tmp_dir / "train_split.json"
+            validation = tmp_dir / "validation_split.json"
+            test = tmp_dir / "test_split.json"
+
+            image_path = tmp_dir / "sample.jpg"
+            image = Image.new("RGB", (64, 64), (255, 255, 255))
+            image.save(image_path.as_posix(), format="JPEG")
+
+            payload = json.dumps([{"path": image_path.as_posix(), "class_index": 0}])
+            train.write_text(payload, encoding="utf-8")
+            validation.write_text(payload, encoding="utf-8")
+            test.write_text(payload, encoding="utf-8")
+
+            split_paths = {
+                "train": train.as_posix(),
+                "validation": validation.as_posix(),
+                "test": test.as_posix(),
+            }
+
+            baseline_loaders = SplitJsonLoaderFactory().create(
+                split_paths,
+                batch_size=1,
+                model_name="baseline_cnn",
+            )
+            efficientnet_loaders = SplitJsonLoaderFactory().create(
+                split_paths,
+                batch_size=1,
+                model_name="efficientnet_b0",
+            )
+
+            baseline_inputs, _ = next(iter(baseline_loaders["train"]))
+            efficientnet_inputs, _ = next(iter(efficientnet_loaders["train"]))
+
+            self.assertAlmostEqual(float(baseline_inputs[0, 0, 0, 0]), 1.0, places=3)
+            self.assertGreater(float(efficientnet_inputs[0, 0, 0, 0]), 2.0)
+        finally:
+            shutil.rmtree(tmp_dir)
+
     def test_trainer_and_evaluator_produce_metrics(self) -> None:
         model = SharedModelFactory().create("baseline_cnn")
         trainer = BaselineTrainer()
