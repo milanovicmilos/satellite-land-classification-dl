@@ -1,6 +1,7 @@
 """Checkpoint persistence for shared training engine."""
 
 import json
+from os import path
 from pathlib import Path
 
 import torch
@@ -11,8 +12,19 @@ class JsonCheckpointStore:
 
     @staticmethod
     def load_checkpoint(model, checkpoint_path: str) -> None:
+        if not path.exists(checkpoint_path):
+            raise FileNotFoundError(
+                "Checkpoint file not found for resume operation: "
+                f"{checkpoint_path}"
+            )
+
         state_dict = torch.load(checkpoint_path, map_location="cpu")
-        model.load_state_dict(state_dict)
+        try:
+            model.load_state_dict(state_dict)
+        except RuntimeError as exc:
+            raise RuntimeError(
+                "Checkpoint incompatibility: Attempting to load weights into a different model architecture."
+            ) from exc
 
     def save_best(self, model, training_state: dict[str, object], output_dir: str) -> str:
         output_path = Path(output_dir)

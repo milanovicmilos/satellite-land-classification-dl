@@ -1,5 +1,6 @@
 """Shared training orchestration service for baseline and fine-tuned models."""
 
+from pathlib import Path
 from typing import Any
 
 from eurosat_classifier.application.config import TrainingConfig
@@ -42,6 +43,14 @@ class TrainingOrchestrator:
         report_output_path: str,
     ) -> dict[str, Any]:
         set_seed(config.split.seed)
+
+        if config.resume_from:
+            resume_path = Path(config.resume_from)
+            if not resume_path.exists():
+                raise FileNotFoundError(
+                    "Invalid training configuration: resume_from checkpoint path does not exist: "
+                    f"{config.resume_from}"
+                )
 
         model = self._model_factory.create(config.model_name, config.model_options)
         if config.resume_from:

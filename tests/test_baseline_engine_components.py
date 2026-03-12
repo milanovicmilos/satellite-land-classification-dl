@@ -207,6 +207,15 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         finally:
             shutil.rmtree(tmp_dir)
 
+    def test_load_checkpoint_raises_clear_error_for_missing_file(self) -> None:
+        model = SharedModelFactory().create("baseline_cnn")
+        store = JsonCheckpointStore()
+
+        with self.assertRaises(FileNotFoundError) as context:
+            store.load_checkpoint(model, "checkpoints/nonexistent/best_checkpoint.pt")
+
+        self.assertIn("Checkpoint file not found", str(context.exception))
+
     def test_efficientnet_stage1_smoke_runs_one_epoch(self) -> None:
         config = JsonConfigLoader(
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
