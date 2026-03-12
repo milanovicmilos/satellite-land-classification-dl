@@ -1,0 +1,221 @@
+{
+  "metadata": {
+    "model_name": "efficientnet_b0",
+    "dataset_root": "/kaggle/input/datasets/apollo2506/eurosat-dataset/EuroSAT",
+    "split_seed": 42,
+    "checkpoint_path": "/kaggle/working/checkpoints/efficientnet_b0/stage2/best_checkpoint.pt",
+    "hyperparameters": {
+      "epochs": 30,
+      "batch_size": 16,
+      "early_stopping_patience": 1,
+      "learning_rate": 0.001
+    },
+    "training_state": {
+      "epochs_requested": 30,
+      "epochs_ran": 4,
+      "best_validation_loss": 0.11835005848326087,
+      "best_validation_f1": 0.960197091550033,
+      "best_epoch": 3,
+      "early_stopping_patience": 1,
+      "learning_rate": 0.001,
+      "batch_size": 16,
+      "class_weights": [
+        0.8999999761581421,
+        0.8999999761581421,
+        0.8999999761581421,
+        1.0800000429153442,
+        1.0800000429153442,
+        1.350000023841858,
+        1.0800000429153442,
+        0.8999999761581421,
+        1.0800000429153442,
+        0.8999999761581421
+      ],
+      "epoch_logs": [
+        {
+          "epoch": 1,
+          "train_loss": 0.5839661312582642,
+          "val_loss": 0.214211112673033,
+          "val_acc": 0.9276543209876543,
+          "val_f1": 0.9286343180015765,
+          "lr": 0.001
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.26027518282085027,
+          "val_loss": 0.19232565800045026,
+          "val_acc": 0.9464197530864198,
+          "val_f1": 0.9444387914872883,
+          "lr": 0.001
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.21161618435364563,
+          "val_loss": 0.11835005848326087,
+          "val_acc": 0.9612345679012345,
+          "val_f1": 0.960197091550033,
+          "lr": 0.001
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.18778563441760687,
+          "val_loss": 0.12935174138979127,
+          "val_acc": 0.9595061728395061,
+          "val_f1": 0.9577360649353002,
+          "lr": 0.001
+        }
+      ]
+    }
+  },
+  "epoch_log_path": "/kaggle/working/artifacts/reports/efficientnet_b0_stage2_smoke.training_log.tmp.json",
+  "metrics": {
+    "accuracy": 0.9607407407407408,
+    "macro_f1_score": 0.9597094658125052,
+    "precision": {
+      "AnnualCrop": 0.9837209302325581,
+      "Forest": 0.9654427645788337,
+      "HerbaceousVegetation": 0.9506726457399103,
+      "Highway": 0.937984496124031,
+      "Industrial": 0.9887640449438202,
+      "Pasture": 0.9496644295302014,
+      "PermanentCrop": 0.9007633587786259,
+      "Residential": 0.9909706546275395,
+      "River": 0.9655172413793104,
+      "SeaLake": 0.9671772428884027
+    },
+    "recall": {
+      "AnnualCrop": 0.94,
+      "Forest": 0.9933333333333333,
+      "HerbaceousVegetation": 0.9422222222222222,
+      "Highway": 0.968,
+      "Industrial": 0.9386666666666666,
+      "Pasture": 0.9433333333333334,
+      "PermanentCrop": 0.944,
+      "Residential": 0.9755555555555555,
+      "River": 0.9706666666666667,
+      "SeaLake": 0.9822222222222222
+    },
+    "confusion_matrix": [
+      [
+        423,
+        0,
+        0,
+        0,
+        0,
+        6,
+        16,
+        0,
+        0,
+        5
+      ],
+      [
+        0,
+        447,
+        1,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        424,
+        0,
+        0,
+        3,
+        19,
+        0,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        1,
+        363,
+        0,
+        0,
+        2,
+        1,
+        7,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        19,
+        352,
+        0,
+        0,
+        3,
+        1,
+        0
+      ],
+      [
+        0,
+        3,
+        5,
+        0,
+        0,
+        283,
+        2,
+        0,
+        0,
+        7
+      ],
+      [
+        2,
+        2,
+        14,
+        1,
+        0,
+        2,
+        354,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        6,
+        1,
+        0,
+        4,
+        0,
+        0,
+        439,
+        0,
+        0
+      ],
+      [
+        1,
+        2,
+        0,
+        4,
+        0,
+        2,
+        0,
+        0,
+        364,
+        2
+      ],
+      [
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        5,
+        442
+      ]
+    ]
+  }
+}

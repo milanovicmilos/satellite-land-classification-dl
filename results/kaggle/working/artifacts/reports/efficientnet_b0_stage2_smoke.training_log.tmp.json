@@ -1,0 +1,39 @@
+{
+  "model_name": "efficientnet_b0",
+  "dataset_root": "/kaggle/input/datasets/apollo2506/eurosat-dataset/EuroSAT",
+  "split_seed": 42,
+  "epoch_logs": [
+    {
+      "epoch": 1,
+      "train_loss": 0.5839661312582642,
+      "val_loss": 0.214211112673033,
+      "val_acc": 0.9276543209876543,
+      "val_f1": 0.9286343180015765,
+      "lr": 0.001
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.26027518282085027,
+      "val_loss": 0.19232565800045026,
+      "val_acc": 0.9464197530864198,
+      "val_f1": 0.9444387914872883,
+      "lr": 0.001
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.21161618435364563,
+      "val_loss": 0.11835005848326087,
+      "val_acc": 0.9612345679012345,
+      "val_f1": 0.960197091550033,
+      "lr": 0.001
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.18778563441760687,
+      "val_loss": 0.12935174138979127,
+      "val_acc": 0.9595061728395061,
+      "val_f1": 0.9577360649353002,
+      "lr": 0.001
+    }
+  ]
+}

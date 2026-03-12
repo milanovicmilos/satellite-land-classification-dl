@@ -70,6 +70,11 @@ class Trainer(Protocol):
         loaders: dict[str, Any],
         epochs: int,
         early_stopping_patience: int,
+        learning_rate: float,
+        scheduler_factor: float,
+        scheduler_patience: int | None,
+        min_learning_rate: float,
+        early_stopping_min_delta: float,
     ) -> dict[str, Any]:
         ...
 

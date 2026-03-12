@@ -9,9 +9,14 @@
     "stratified": true
   },
   "training": {
-    "epochs": 1,
+    "epochs": 30,
     "batch_size": 16,
-    "early_stopping_patience": 1
+    "early_stopping_patience": 3,
+    "early_stopping_min_delta": 0.0005,
+    "learning_rate": 0.001,
+    "scheduler_factor": 0.5,
+    "scheduler_patience": 1,
+    "min_learning_rate": 0.000001
   },
   "model": {
     "name": "efficientnet_b0",

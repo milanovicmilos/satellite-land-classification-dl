@@ -67,6 +67,11 @@ class TrainingOrchestrator:
             loaders=loaders,
             epochs=config.epochs,
             early_stopping_patience=config.early_stopping_patience,
+            learning_rate=config.learning_rate,
+            scheduler_factor=config.scheduler_factor,
+            scheduler_patience=config.scheduler_patience,
+            min_learning_rate=config.min_learning_rate,
+            early_stopping_min_delta=config.early_stopping_min_delta,
         )
 
         test_loader = loaders["test"]
@@ -90,7 +95,11 @@ class TrainingOrchestrator:
                     "epochs": config.epochs,
                     "batch_size": config.batch_size,
                     "early_stopping_patience": config.early_stopping_patience,
-                    "learning_rate": training_state.get("learning_rate"),
+                    "learning_rate": config.learning_rate,
+                    "scheduler_factor": config.scheduler_factor,
+                    "scheduler_patience": config.scheduler_patience,
+                    "min_learning_rate": config.min_learning_rate,
+                    "early_stopping_min_delta": config.early_stopping_min_delta,
                 },
                 "training_state": training_state,
             },

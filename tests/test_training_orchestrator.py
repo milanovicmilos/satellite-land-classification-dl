@@ -31,12 +31,23 @@ class _FakeDataLoaderFactory:
 
 
 class _FakeTrainer:
-    def train(self, model, loaders, epochs: int, early_stopping_patience: int) -> dict[str, object]:
+    def train(
+        self,
+        model,
+        loaders,
+        epochs: int,
+        early_stopping_patience: int,
+        learning_rate: float,
+        scheduler_factor: float,
+        scheduler_patience: int | None,
+        min_learning_rate: float,
+        early_stopping_min_delta: float,
+    ) -> dict[str, object]:
         return {
             "epochs_ran": 3,
             "best_validation_loss": 0.4,
             "patience": early_stopping_patience,
-            "learning_rate": 0.001,
+            "learning_rate": learning_rate,
             "batch_size": 32,
             "epoch_logs": [
                 {
@@ -130,7 +141,18 @@ class TrainingOrchestratorTests(unittest.TestCase):
 
     def test_resume_checkpoint_is_loaded_before_training(self) -> None:
         class _ResumeAwareTrainer:
-            def train(self, model, loaders, epochs: int, early_stopping_patience: int):
+            def train(
+                self,
+                model,
+                loaders,
+                epochs: int,
+                early_stopping_patience: int,
+                learning_rate: float,
+                scheduler_factor: float,
+                scheduler_patience: int | None,
+                min_learning_rate: float,
+                early_stopping_min_delta: float,
+            ):
                 loaded_from = model.get("loaded_from", "")
                 if not loaded_from.replace("\\", "/").endswith("/stage1/best_checkpoint.pt"):
                     raise AssertionError("Checkpoint must be loaded before training starts.")

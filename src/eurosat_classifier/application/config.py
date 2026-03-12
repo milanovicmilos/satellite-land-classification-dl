@@ -16,6 +16,11 @@ class TrainingConfig:
     batch_size: int
     early_stopping_patience: int
     split: DatasetSplit
+    learning_rate: float = 1e-3
+    scheduler_factor: float = 0.5
+    scheduler_patience: int | None = None
+    min_learning_rate: float = 1e-6
+    early_stopping_min_delta: float = 0.0
     resume_from: str | None = None
     model_options: dict[str, object] = field(default_factory=dict)
 

@@ -4,10 +4,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 from PIL import Image
 import torch
 from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms as T
+from torchvision.transforms import InterpolationMode
 
 from eurosat_classifier.infrastructure.models.registry import get_model_normalization
 
@@ -21,22 +22,49 @@ class SplitJsonDataset(Dataset):
         image_size: int = 64,
         normalize_mean: tuple[float, float, float] | None = None,
         normalize_std: tuple[float, float, float] | None = None,
+        training_augmentation: bool = False,
     ) -> None:
         self._samples = samples
         self._image_size = image_size
         self._normalize_mean = normalize_mean
         self._normalize_std = normalize_std
-        self._normalize_mean_tensor = (
-            torch.tensor(normalize_mean, dtype=torch.float32).view(3, 1, 1)
-            if normalize_mean is not None
-            else None
-        )
-        self._normalize_std_tensor = (
-            torch.tensor(normalize_std, dtype=torch.float32).view(3, 1, 1)
-            if normalize_std is not None
-            else None
-        )
+        self._training_augmentation = training_augmentation
+        self._transform = self._build_transform()
         self.labels: list[int] = [int(sample["class_index"]) for sample in samples]
+
+    def _build_transform(self) -> T.Compose:
+        transforms: list[Any] = [
+            T.Resize(
+                (self._image_size, self._image_size),
+                interpolation=InterpolationMode.BILINEAR,
+            )
+        ]
+
+        if self._training_augmentation:
+            transforms.extend(
+                [
+                    T.RandomHorizontalFlip(p=0.5),
+                    T.RandomVerticalFlip(p=0.5),
+                    T.RandomRotation(
+                        degrees=20,
+                        interpolation=InterpolationMode.BILINEAR,
+                        fill=(255, 255, 255),
+                    ),
+                    T.RandomAffine(
+                        degrees=0,
+                        translate=(0.08, 0.08),
+                        scale=(0.9, 1.1),
+                        interpolation=InterpolationMode.BILINEAR,
+                        fill=(255, 255, 255),
+                    ),
+                ]
+            )
+
+        transforms.append(T.ToTensor())
+        if self._normalize_mean is not None and self._normalize_std is not None:
+            transforms.append(T.Normalize(mean=self._normalize_mean, std=self._normalize_std))
+
+        return T.Compose(transforms)
 
     def __len__(self) -> int:
         return len(self._samples)
@@ -48,14 +76,7 @@ class SplitJsonDataset(Dataset):
 
         with Image.open(image_path) as image:
             image = image.convert("RGB")
-            if image.size != (self._image_size, self._image_size):
-                image = image.resize((self._image_size, self._image_size))
-
-            image_array = np.array(image, copy=True)
-            image_tensor = torch.from_numpy(image_array).permute(2, 0, 1).to(dtype=torch.float32) / 255.0
-
-            if self._normalize_mean_tensor is not None and self._normalize_std_tensor is not None:
-                image_tensor = (image_tensor - self._normalize_mean_tensor) / self._normalize_std_tensor
+            image_tensor = self._transform(image)
 
         label_tensor = torch.tensor(class_index, dtype=torch.long)
         return image_tensor, label_tensor
@@ -80,6 +101,7 @@ class SplitJsonLoaderFactory:
         normalize_stats = get_model_normalization(model_name)
         normalize_mean = normalize_stats[0] if normalize_stats else None
         normalize_std = normalize_stats[1] if normalize_stats else None
+        enable_training_augmentation = model_name in {"efficientnet_b0", "resnet50"}
 
         return {
             "train": DataLoader(
@@ -87,6 +109,7 @@ class SplitJsonLoaderFactory:
                     train_samples,
                     normalize_mean=normalize_mean,
                     normalize_std=normalize_std,
+                    training_augmentation=enable_training_augmentation,
                 ),
                 batch_size=batch_size,
                 shuffle=True,

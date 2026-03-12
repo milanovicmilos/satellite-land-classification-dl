@@ -15,7 +15,7 @@ class BaselineTrainer:
     """Trains baseline CNN with class weights, scheduler, and robust early stopping."""
 
     def __init__(self, learning_rate: float = 1e-3) -> None:
-        self._learning_rate = learning_rate
+        self._default_learning_rate = learning_rate
         self._metrics_calculator = MetricsCalculator()
 
     def train(
@@ -24,6 +24,11 @@ class BaselineTrainer:
         loaders,
         epochs: int,
         early_stopping_patience: int,
+        learning_rate: float,
+        scheduler_factor: float,
+        scheduler_patience: int | None,
+        min_learning_rate: float,
+        early_stopping_min_delta: float,
     ) -> dict[str, object]:
         train_split = loaders["train"]
         if not train_split:
@@ -34,13 +39,18 @@ class BaselineTrainer:
 
         class_weights = self._compute_class_weights(train_split, model.num_classes, device)
         criterion = nn.CrossEntropyLoss(weight=class_weights)
-        optimizer = Adam(model.parameters(), lr=self._learning_rate)
+        effective_learning_rate = learning_rate or self._default_learning_rate
+        effective_scheduler_patience = (
+            scheduler_patience if scheduler_patience is not None else max(1, early_stopping_patience // 2)
+        )
+
+        optimizer = Adam(model.parameters(), lr=effective_learning_rate)
         scheduler = ReduceLROnPlateau(
             optimizer,
             mode="min",
-            factor=0.5,
-            patience=max(1, early_stopping_patience // 2),
-            min_lr=1e-6,
+            factor=scheduler_factor,
+            patience=max(1, effective_scheduler_patience),
+            min_lr=min_learning_rate,
         )
 
         best_state = deepcopy(model.state_dict())
@@ -77,7 +87,7 @@ class BaselineTrainer:
                 }
             )
 
-            if validation_macro_f1 > best_validation_f1:
+            if validation_macro_f1 > best_validation_f1 + early_stopping_min_delta:
                 best_validation_f1 = validation_macro_f1
                 best_validation_loss = validation_loss
                 best_state = deepcopy(model.state_dict())
@@ -97,7 +107,11 @@ class BaselineTrainer:
             "best_validation_f1": float(best_validation_f1),
             "best_epoch": best_epoch,
             "early_stopping_patience": early_stopping_patience,
-            "learning_rate": self._learning_rate,
+            "early_stopping_min_delta": early_stopping_min_delta,
+            "learning_rate": float(effective_learning_rate),
+            "scheduler_factor": float(scheduler_factor),
+            "scheduler_patience": int(max(1, effective_scheduler_patience)),
+            "min_learning_rate": float(min_learning_rate),
             "batch_size": int(getattr(train_split, "batch_size", 0) or 0),
             "class_weights": [float(value) for value in class_weights.detach().cpu().tolist()],
             "epoch_logs": epoch_logs,

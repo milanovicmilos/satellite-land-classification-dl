@@ -205,7 +205,17 @@ class BaselineEngineComponentsTests(unittest.TestCase):
                 batch_size=2,
             )
 
-            state = trainer.train(model, loaders, epochs=2, early_stopping_patience=1)
+            state = trainer.train(
+                model,
+                loaders,
+                epochs=2,
+                early_stopping_patience=1,
+                learning_rate=0.001,
+                scheduler_factor=0.5,
+                scheduler_patience=1,
+                min_learning_rate=1e-6,
+                early_stopping_min_delta=0.0,
+            )
             summary = evaluator.evaluate(model, loaders["test"])
         finally:
             shutil.rmtree(tmp_dir)
@@ -310,7 +320,7 @@ class BaselineEngineComponentsTests(unittest.TestCase):
             shutil.rmtree(tmp_dir)
 
         self.assertIn("accuracy", result)
-        self.assertEqual(result["training_state"]["epochs_requested"], 1)
+        self.assertEqual(result["training_state"]["epochs_requested"], config.epochs)
 
 
 if __name__ == "__main__":
