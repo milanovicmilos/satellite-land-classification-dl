@@ -9,6 +9,8 @@ from PIL import Image
 import torch
 from torch.utils.data import DataLoader, Dataset
 
+from eurosat_classifier.infrastructure.models.registry import get_model_normalization
+
 
 class SplitJsonDataset(Dataset):
     """Dataset built from persisted split JSON entries."""
@@ -54,9 +56,6 @@ class SplitJsonDataset(Dataset):
 class SplitJsonLoaderFactory:
     """Loads split JSON files and returns loader-like collections."""
 
-    _IMAGENET_MEAN: tuple[float, float, float] = (0.485, 0.456, 0.406)
-    _IMAGENET_STD: tuple[float, float, float] = (0.229, 0.224, 0.225)
-
     def create(
         self,
         split_artifacts: dict[str, str],
@@ -70,11 +69,9 @@ class SplitJsonLoaderFactory:
         validation_samples = self._read(split_artifacts["validation"])
         test_samples = self._read(split_artifacts["test"])
 
-        normalize_mean: tuple[float, float, float] | None = None
-        normalize_std: tuple[float, float, float] | None = None
-        if model_name == "efficientnet_b0":
-            normalize_mean = self._IMAGENET_MEAN
-            normalize_std = self._IMAGENET_STD
+        normalize_stats = get_model_normalization(model_name)
+        normalize_mean = normalize_stats[0] if normalize_stats else None
+        normalize_std = normalize_stats[1] if normalize_stats else None
 
         return {
             "train": DataLoader(

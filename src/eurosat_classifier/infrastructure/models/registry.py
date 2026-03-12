@@ -10,10 +10,17 @@ from typing import Any, Callable
 
 ModelBuilder = Callable[[dict[str, object] | None], Any]
 
+NormalizationStats = tuple[tuple[float, float, float], tuple[float, float, float]]
+
 SUPPORTED_SHARED_MODELS = {
     "baseline_cnn": "Shared baseline CNN implementation.",
     "efficientnet_b0": "Milos-owned EfficientNetB0 implementation with staged fine-tuning support.",
     "resnet50": "Reserved for Bojan's ResNet50 implementation.",
+}
+
+MODEL_NORMALIZATION: dict[str, NormalizationStats] = {
+    "efficientnet_b0": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+    "resnet50": ((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
 }
 
 _REGISTERED_BUILDERS: dict[str, ModelBuilder] = {}
@@ -62,3 +69,11 @@ def create_registered_model(model_name: str, model_options: dict[str, object] | 
         )
 
     raise ValueError(f"Unsupported model name: {model_name}")
+
+
+def get_model_normalization(model_name: str | None) -> NormalizationStats | None:
+    """Returns normalization stats for a model name, if defined."""
+
+    if model_name is None:
+        return None
+    return MODEL_NORMALIZATION.get(model_name)
