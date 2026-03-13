@@ -28,6 +28,17 @@ class JsonConfigLoader:
                 merged[key] = value
         return merged
 
+    @staticmethod
+    def _resolve_augmentation_mode(raw_config: dict[str, Any]) -> str | None:
+        training_config = raw_config.get("training", {})
+        resolved_mode = training_config.get("augmentation_mode")
+        model_name = str(raw_config.get("model", {}).get("name", "")).lower()
+
+        if resolved_mode is None and model_name.startswith("efficientnet"):
+            return "full"
+
+        return resolved_mode
+
     def load(self, path: str) -> TrainingConfig:
         config_data: dict[str, Any] = {}
 
@@ -36,6 +47,7 @@ class JsonConfigLoader:
 
         user_config = self._read_json(path)
         raw_config = self._deep_merge(config_data, user_config)
+        training_config = raw_config["training"]
 
         split = DatasetSplit(
             train_ratio=raw_config["split"]["train_ratio"],
@@ -45,14 +57,24 @@ class JsonConfigLoader:
             stratified=raw_config["split"].get("stratified", True),
         )
 
+        scheduler_patience = training_config.get("scheduler_patience")
+        if scheduler_patience is None:
+            scheduler_patience = max(0, int(training_config["early_stopping_patience"]) // 2)
+
         return TrainingConfig(
             experiment_name=raw_config["experiment_name"],
             dataset_root=raw_config["dataset_root"],
             model_name=raw_config["model"]["name"],
-            epochs=raw_config["training"]["epochs"],
-            batch_size=raw_config["training"]["batch_size"],
-            early_stopping_patience=raw_config["training"]["early_stopping_patience"],
+            epochs=training_config["epochs"],
+            batch_size=training_config["batch_size"],
+            early_stopping_patience=training_config["early_stopping_patience"],
+            learning_rate=training_config.get("learning_rate", 1e-3),
+            scheduler_factor=training_config.get("scheduler_factor", 0.5),
+            scheduler_patience=int(scheduler_patience),
+            min_learning_rate=training_config.get("min_learning_rate", 1e-6),
+            early_stopping_min_delta=training_config.get("early_stopping_min_delta", 0.0),
+            augmentation_mode=self._resolve_augmentation_mode(raw_config),
             split=split,
-            resume_from=raw_config["training"].get("resume_from"),
+            resume_from=training_config.get("resume_from"),
             model_options=raw_config["model"].get("options", {}),
         )

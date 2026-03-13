@@ -18,9 +18,9 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "baseline.example.json"))
+        config = loader.load(str(PROJECT_ROOT / "configs" / "baseline_cnn_full.json"))
 
-        self.assertEqual(config.experiment_name, "baseline-cnn-example")
+        self.assertEqual(config.experiment_name, "baseline-cnn-full")
         self.assertEqual(config.model_name, "baseline_cnn")
         self.assertEqual(config.model_options, {})
         self.assertEqual(config.split.seed, 42)
@@ -30,7 +30,19 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "baseline.minimal.json"))
+        payload = {
+            "experiment_name": "baseline-cnn-minimal",
+            "model": {"name": "baseline_cnn"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
 
         self.assertEqual(config.experiment_name, "baseline-cnn-minimal")
         self.assertEqual(config.dataset_root, "data/EuroSAT")
@@ -68,7 +80,7 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.json"))
+        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.optimized.json"))
 
         self.assertEqual(config.model_name, "efficientnet_b0")
         self.assertTrue(bool(config.model_options.get("freeze_backbone")))
@@ -79,7 +91,7 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage2.json"))
+        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage2.optimized.json"))
 
         self.assertEqual(config.model_name, "efficientnet_b0")
         self.assertFalse(bool(config.model_options.get("freeze_backbone")))
@@ -87,6 +99,72 @@ class JsonConfigLoaderTests(unittest.TestCase):
             config.resume_from,
             "checkpoints/efficientnet_b0/stage1/best_checkpoint.pt",
         )
+
+    def test_load_sets_full_augmentation_for_efficientnet_when_omitted(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        payload = {
+            "experiment_name": "eff-omitted-augmentation",
+            "model": {"name": "efficientnet_b0"},
+            "training": {"augmentation_mode": None},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertEqual(config.augmentation_mode, "full")
+
+    def test_load_keeps_explicit_augmentation_mode_for_efficientnet(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        payload = {
+            "experiment_name": "eff-explicit-augmentation",
+            "model": {"name": "efficientnet_b0"},
+            "training": {"augmentation_mode": "flips"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertEqual(config.augmentation_mode, "flips")
+
+    def test_load_keeps_null_augmentation_for_non_efficientnet_when_omitted(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        payload = {
+            "experiment_name": "resnet-omitted-augmentation",
+            "model": {"name": "resnet50"},
+            "training": {"augmentation_mode": None},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertIsNone(config.augmentation_mode)
 
 
 if __name__ == "__main__":

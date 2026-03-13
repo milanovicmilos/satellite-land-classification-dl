@@ -1,5 +1,5 @@
 {
-  "experiment_name": "efficientnet-b0-stage1-frozen",
+  "experiment_name": "baseline-cnn-full",
   "dataset_root": "data/EuroSAT",
   "split": {
     "train_ratio": 0.7,
@@ -9,15 +9,12 @@
     "stratified": true
   },
   "training": {
-    "epochs": 1,
+    "epochs": 50,
     "batch_size": 16,
-    "early_stopping_patience": 1
+    "early_stopping_patience": 10,
+    "augmentation_mode": "none"
   },
   "model": {
-    "name": "efficientnet_b0",
-    "options": {
-      "use_pretrained": true,
-      "freeze_backbone": true
-    }
+    "name": "baseline_cnn"
   }
 }

@@ -26,18 +26,36 @@ class _FakeDataLoaderFactory:
         split_artifacts: dict[str, str],
         batch_size: int,
         model_name: str | None = None,
+        augmentation_mode: str | None = None,
     ) -> dict[str, object]:
         return {"train": [1], "validation": [2], "test": [3]}
 
 
 class _FakeTrainer:
-    def train(self, model, loaders, epochs: int, early_stopping_patience: int) -> dict[str, object]:
+    def train(
+        self,
+        model,
+        loaders,
+        epochs: int,
+        early_stopping_patience: int,
+        learning_rate: float,
+        scheduler_factor: float,
+        scheduler_patience: int,
+        min_learning_rate: float,
+        early_stopping_min_delta: float,
+    ) -> dict[str, object]:
         return {
+            "epochs_requested": 10,
             "epochs_ran": 3,
             "best_validation_loss": 0.4,
-            "patience": early_stopping_patience,
-            "learning_rate": 0.001,
-            "batch_size": 32,
+            "early_stopping_patience": 7,
+            "early_stopping_min_delta": 0.004,
+            "learning_rate": 0.123,
+            "scheduler_factor": 0.25,
+            "scheduler_patience": 0,
+            "min_learning_rate": 1e-7,
+            "batch_size": 99,
+            "augmentation_mode": "flips",
             "epoch_logs": [
                 {
                     "epoch": 1,
@@ -101,6 +119,7 @@ class TrainingOrchestratorTests(unittest.TestCase):
             batch_size=32,
             early_stopping_patience=3,
             split=DatasetSplit(0.7, 0.15, 0.15, 42),
+            augmentation_mode="none",
         )
 
         tmp_dir = Path(tempfile.mkdtemp())
@@ -125,12 +144,26 @@ class TrainingOrchestratorTests(unittest.TestCase):
             report_content = Path(result["report_path"]).read_text(encoding="utf-8")
             self.assertIn("hyperparameters", report_content)
             self.assertIn("epoch_logs", report_content)
+            self.assertIn("'learning_rate': 0.123", report_content)
+            self.assertIn("'scheduler_patience': 0", report_content)
+            self.assertIn("'batch_size': 99", report_content)
         finally:
             shutil.rmtree(tmp_dir)
 
     def test_resume_checkpoint_is_loaded_before_training(self) -> None:
         class _ResumeAwareTrainer:
-            def train(self, model, loaders, epochs: int, early_stopping_patience: int):
+            def train(
+                self,
+                model,
+                loaders,
+                epochs: int,
+                early_stopping_patience: int,
+                learning_rate: float,
+                scheduler_factor: float,
+                scheduler_patience: int,
+                min_learning_rate: float,
+                early_stopping_min_delta: float,
+            ):
                 loaded_from = model.get("loaded_from", "")
                 if not loaded_from.replace("\\", "/").endswith("/stage1/best_checkpoint.pt"):
                     raise AssertionError("Checkpoint must be loaded before training starts.")
@@ -165,6 +198,7 @@ class TrainingOrchestratorTests(unittest.TestCase):
                 batch_size=8,
                 early_stopping_patience=1,
                 split=DatasetSplit(0.7, 0.15, 0.15, 42),
+                augmentation_mode="flips",
                 resume_from=resume_path.as_posix(),
                 model_options={"freeze_backbone": False},
             )
@@ -201,6 +235,7 @@ class TrainingOrchestratorTests(unittest.TestCase):
             batch_size=8,
             early_stopping_patience=1,
             split=DatasetSplit(0.7, 0.15, 0.15, 42),
+            augmentation_mode="flips",
             resume_from="checkpoints/does-not-exist.pt",
             model_options={"freeze_backbone": False},
         )

@@ -57,6 +57,7 @@ class DataLoaderFactory(Protocol):
         split_artifacts: dict[str, str],
         batch_size: int,
         model_name: str | None = None,
+        augmentation_mode: str | None = None,
     ) -> dict[str, Any]:
         ...
 
@@ -70,6 +71,11 @@ class Trainer(Protocol):
         loaders: dict[str, Any],
         epochs: int,
         early_stopping_patience: int,
+        learning_rate: float,
+        scheduler_factor: float,
+        scheduler_patience: int,
+        min_learning_rate: float,
+        early_stopping_min_delta: float,
     ) -> dict[str, Any]:
         ...
 

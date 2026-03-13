@@ -44,7 +44,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="EuroSAT project scaffold CLI")
     parser.add_argument(
         "--config",
-        default="configs/baseline.example.json",
+        default="configs/baseline_cnn_full.json",
         help="Path to an experiment configuration file.",
     )
     parser.add_argument(

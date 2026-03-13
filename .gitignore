@@ -28,6 +28,7 @@ artifacts/splits/*
 !artifacts/splits/split_manifest.json
 checkpoints/
 logs/
+archive/*.zip
 
 # Dataset storage
 data/*

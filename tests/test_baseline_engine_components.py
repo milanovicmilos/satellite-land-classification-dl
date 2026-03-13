@@ -142,6 +142,45 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         finally:
             shutil.rmtree(tmp_dir)
 
+    def test_split_loader_supports_flips_only_augmentation_mode(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train = tmp_dir / "train_split.json"
+            validation = tmp_dir / "validation_split.json"
+            test = tmp_dir / "test_split.json"
+
+            image_path = tmp_dir / "sample.jpg"
+            image = Image.new("RGB", (64, 64), (255, 255, 255))
+            image.save(image_path.as_posix(), format="JPEG")
+
+            payload = json.dumps([{"path": image_path.as_posix(), "class_index": 0}])
+            train.write_text(payload, encoding="utf-8")
+            validation.write_text(payload, encoding="utf-8")
+            test.write_text(payload, encoding="utf-8")
+
+            split_paths = {
+                "train": train.as_posix(),
+                "validation": validation.as_posix(),
+                "test": test.as_posix(),
+            }
+
+            loaders = SplitJsonLoaderFactory().create(
+                split_paths,
+                batch_size=1,
+                model_name="efficientnet_b0",
+                augmentation_mode="flips",
+            )
+
+            train_transforms = loaders["train"].dataset._transform.transforms
+            transform_names = [type(transform).__name__ for transform in train_transforms]
+
+            self.assertIn("RandomHorizontalFlip", transform_names)
+            self.assertIn("RandomVerticalFlip", transform_names)
+            self.assertNotIn("RandomRotation", transform_names)
+            self.assertNotIn("RandomAffine", transform_names)
+        finally:
+            shutil.rmtree(tmp_dir)
+
     def test_split_loader_uses_registry_normalization_for_future_models(self) -> None:
         tmp_dir = Path(tempfile.mkdtemp())
         try:
@@ -172,6 +211,13 @@ class BaselineEngineComponentsTests(unittest.TestCase):
 
             resnet_inputs, _ = next(iter(resnet_loaders["train"]))
             self.assertGreater(float(resnet_inputs[0, 0, 0, 0]), 2.0)
+
+            train_transforms = resnet_loaders["train"].dataset._transform.transforms
+            transform_names = [type(transform).__name__ for transform in train_transforms]
+            self.assertNotIn("RandomHorizontalFlip", transform_names)
+            self.assertNotIn("RandomVerticalFlip", transform_names)
+            self.assertNotIn("RandomRotation", transform_names)
+            self.assertNotIn("RandomAffine", transform_names)
         finally:
             shutil.rmtree(tmp_dir)
 
@@ -205,7 +251,17 @@ class BaselineEngineComponentsTests(unittest.TestCase):
                 batch_size=2,
             )
 
-            state = trainer.train(model, loaders, epochs=2, early_stopping_patience=1)
+            state = trainer.train(
+                model,
+                loaders,
+                epochs=2,
+                early_stopping_patience=1,
+                learning_rate=0.001,
+                scheduler_factor=0.5,
+                scheduler_patience=1,
+                min_learning_rate=1e-6,
+                early_stopping_min_delta=0.0,
+            )
             summary = evaluator.evaluate(model, loaders["test"])
         finally:
             shutil.rmtree(tmp_dir)
@@ -215,6 +271,183 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         self.assertIsNotNone(summary.confusion_matrix)
         self.assertIn("epoch_logs", state)
         self.assertIn("best_validation_f1", state)
+
+    def test_trainer_preserves_zero_scheduler_patience(self) -> None:
+        model = SharedModelFactory().create("baseline_cnn")
+        trainer = BaselineTrainer()
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train_split = tmp_dir / "train_split.json"
+            validation_split = tmp_dir / "validation_split.json"
+            test_split = tmp_dir / "test_split.json"
+
+            samples: list[dict[str, object]] = []
+            for idx in range(6):
+                image_path = tmp_dir / f"zero_scheduler_{idx}.jpg"
+                self._create_image(image_path)
+                samples.append({"path": image_path.as_posix(), "class_index": idx % 3})
+
+            train_split.write_text(json.dumps(samples[:4]), encoding="utf-8")
+            validation_split.write_text(json.dumps(samples[4:5]), encoding="utf-8")
+            test_split.write_text(json.dumps(samples[3:6]), encoding="utf-8")
+
+            loaders = SplitJsonLoaderFactory().create(
+                {
+                    "train": train_split.as_posix(),
+                    "validation": validation_split.as_posix(),
+                    "test": test_split.as_posix(),
+                },
+                batch_size=2,
+            )
+
+            state = trainer.train(
+                model,
+                loaders,
+                epochs=2,
+                early_stopping_patience=1,
+                learning_rate=0.001,
+                scheduler_factor=0.5,
+                scheduler_patience=0,
+                min_learning_rate=1e-6,
+                early_stopping_min_delta=0.0,
+            )
+        finally:
+            shutil.rmtree(tmp_dir)
+
+        self.assertEqual(state["scheduler_patience"], 0)
+
+    def test_trainer_raises_for_non_positive_learning_rate(self) -> None:
+        model = SharedModelFactory().create("baseline_cnn")
+        trainer = BaselineTrainer()
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train_split = tmp_dir / "train_split.json"
+            validation_split = tmp_dir / "validation_split.json"
+            test_split = tmp_dir / "test_split.json"
+
+            samples: list[dict[str, object]] = []
+            for idx in range(6):
+                image_path = tmp_dir / f"lr_validation_{idx}.jpg"
+                self._create_image(image_path)
+                samples.append({"path": image_path.as_posix(), "class_index": idx % 3})
+
+            train_split.write_text(json.dumps(samples[:4]), encoding="utf-8")
+            validation_split.write_text(json.dumps(samples[4:5]), encoding="utf-8")
+            test_split.write_text(json.dumps(samples[3:6]), encoding="utf-8")
+
+            loaders = SplitJsonLoaderFactory().create(
+                {
+                    "train": train_split.as_posix(),
+                    "validation": validation_split.as_posix(),
+                    "test": test_split.as_posix(),
+                },
+                batch_size=2,
+            )
+
+            with self.assertRaises(ValueError):
+                trainer.train(
+                    model,
+                    loaders,
+                    epochs=2,
+                    early_stopping_patience=1,
+                    learning_rate=0.0,
+                    scheduler_factor=0.5,
+                    scheduler_patience=0,
+                    min_learning_rate=1e-6,
+                    early_stopping_min_delta=0.0,
+                )
+        finally:
+            shutil.rmtree(tmp_dir)
+
+    def test_trainer_raises_for_negative_scheduler_patience(self) -> None:
+        model = SharedModelFactory().create("baseline_cnn")
+        trainer = BaselineTrainer()
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train_split = tmp_dir / "train_split.json"
+            validation_split = tmp_dir / "validation_split.json"
+            test_split = tmp_dir / "test_split.json"
+
+            samples: list[dict[str, object]] = []
+            for idx in range(6):
+                image_path = tmp_dir / f"scheduler_validation_{idx}.jpg"
+                self._create_image(image_path)
+                samples.append({"path": image_path.as_posix(), "class_index": idx % 3})
+
+            train_split.write_text(json.dumps(samples[:4]), encoding="utf-8")
+            validation_split.write_text(json.dumps(samples[4:5]), encoding="utf-8")
+            test_split.write_text(json.dumps(samples[3:6]), encoding="utf-8")
+
+            loaders = SplitJsonLoaderFactory().create(
+                {
+                    "train": train_split.as_posix(),
+                    "validation": validation_split.as_posix(),
+                    "test": test_split.as_posix(),
+                },
+                batch_size=2,
+            )
+
+            with self.assertRaises(ValueError):
+                trainer.train(
+                    model,
+                    loaders,
+                    epochs=2,
+                    early_stopping_patience=1,
+                    learning_rate=0.001,
+                    scheduler_factor=0.5,
+                    scheduler_patience=-1,
+                    min_learning_rate=1e-6,
+                    early_stopping_min_delta=0.0,
+                )
+        finally:
+            shutil.rmtree(tmp_dir)
+
+    def test_trainer_raises_for_non_positive_min_learning_rate(self) -> None:
+        model = SharedModelFactory().create("baseline_cnn")
+        trainer = BaselineTrainer()
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train_split = tmp_dir / "train_split.json"
+            validation_split = tmp_dir / "validation_split.json"
+            test_split = tmp_dir / "test_split.json"
+
+            samples: list[dict[str, object]] = []
+            for idx in range(6):
+                image_path = tmp_dir / f"min_lr_validation_{idx}.jpg"
+                self._create_image(image_path)
+                samples.append({"path": image_path.as_posix(), "class_index": idx % 3})
+
+            train_split.write_text(json.dumps(samples[:4]), encoding="utf-8")
+            validation_split.write_text(json.dumps(samples[4:5]), encoding="utf-8")
+            test_split.write_text(json.dumps(samples[3:6]), encoding="utf-8")
+
+            loaders = SplitJsonLoaderFactory().create(
+                {
+                    "train": train_split.as_posix(),
+                    "validation": validation_split.as_posix(),
+                    "test": test_split.as_posix(),
+                },
+                batch_size=2,
+            )
+
+            with self.assertRaises(ValueError):
+                trainer.train(
+                    model,
+                    loaders,
+                    epochs=2,
+                    early_stopping_patience=1,
+                    learning_rate=0.001,
+                    scheduler_factor=0.5,
+                    scheduler_patience=0,
+                    min_learning_rate=0.0,
+                    early_stopping_min_delta=0.0,
+                )
+        finally:
+            shutil.rmtree(tmp_dir)
 
     def test_checkpoint_metadata_contains_hyperparameters(self) -> None:
         model = SharedModelFactory().create("baseline_cnn")
@@ -269,7 +502,7 @@ class BaselineEngineComponentsTests(unittest.TestCase):
     def test_efficientnet_stage1_smoke_runs_one_epoch(self) -> None:
         config = JsonConfigLoader(
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
-        ).load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.json"))
+        ).load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.optimized.json"))
 
         tmp_dir = Path(tempfile.mkdtemp())
         try:
@@ -310,7 +543,7 @@ class BaselineEngineComponentsTests(unittest.TestCase):
             shutil.rmtree(tmp_dir)
 
         self.assertIn("accuracy", result)
-        self.assertEqual(result["training_state"]["epochs_requested"], 1)
+        self.assertEqual(result["training_state"]["epochs_requested"], config.epochs)
 
 
 if __name__ == "__main__":
