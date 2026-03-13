@@ -152,4 +152,4 @@ class SplitJsonLoaderFactory:
                 raise ValueError("augmentation_mode must be one of: none, flips, full")
             return augmentation_mode
 
-        return "full" if model_name in {"efficientnet_b0", "resnet50"} else "none"
+        return "full" if model_name == "efficientnet_b0" else "none"

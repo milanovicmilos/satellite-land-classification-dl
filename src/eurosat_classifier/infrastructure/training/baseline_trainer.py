@@ -14,8 +14,7 @@ from eurosat_classifier.domain.metrics_calculator import MetricsCalculator
 class BaselineTrainer:
     """Trains baseline CNN with class weights, scheduler, and robust early stopping."""
 
-    def __init__(self, learning_rate: float = 1e-3) -> None:
-        self._default_learning_rate = learning_rate
+    def __init__(self) -> None:
         self._metrics_calculator = MetricsCalculator()
 
     def train(
@@ -36,6 +35,10 @@ class BaselineTrainer:
 
         if learning_rate <= 0:
             raise ValueError("learning_rate must be greater than 0.")
+        if scheduler_patience < 0:
+            raise ValueError("scheduler_patience must be non-negative.")
+        if min_learning_rate <= 0:
+            raise ValueError("min_learning_rate must be greater than 0.")
         if not (0 < scheduler_factor <= 1):
             raise ValueError("scheduler_factor must be in the interval (0, 1].")
         if early_stopping_min_delta < 0:
