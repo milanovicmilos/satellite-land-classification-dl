@@ -22,13 +22,13 @@ class SplitJsonDataset(Dataset):
         image_size: int = 64,
         normalize_mean: tuple[float, float, float] | None = None,
         normalize_std: tuple[float, float, float] | None = None,
-        training_augmentation: bool = False,
+        augmentation_mode: str = "none",
     ) -> None:
         self._samples = samples
         self._image_size = image_size
         self._normalize_mean = normalize_mean
         self._normalize_std = normalize_std
-        self._training_augmentation = training_augmentation
+        self._augmentation_mode = augmentation_mode
         self._transform = self._build_transform()
         self.labels: list[int] = [int(sample["class_index"]) for sample in samples]
 
@@ -40,11 +40,17 @@ class SplitJsonDataset(Dataset):
             )
         ]
 
-        if self._training_augmentation:
+        if self._augmentation_mode in {"flips", "full"}:
             transforms.extend(
                 [
                     T.RandomHorizontalFlip(p=0.5),
                     T.RandomVerticalFlip(p=0.5),
+                ]
+            )
+
+        if self._augmentation_mode == "full":
+            transforms.extend(
+                [
                     T.RandomRotation(
                         degrees=20,
                         interpolation=InterpolationMode.BILINEAR,
@@ -90,6 +96,7 @@ class SplitJsonLoaderFactory:
         split_artifacts: dict[str, str],
         batch_size: int,
         model_name: str | None = None,
+        augmentation_mode: str | None = None,
     ) -> dict[str, Any]:
         if batch_size <= 0:
             raise ValueError("batch_size must be greater than 0")
@@ -101,7 +108,7 @@ class SplitJsonLoaderFactory:
         normalize_stats = get_model_normalization(model_name)
         normalize_mean = normalize_stats[0] if normalize_stats else None
         normalize_std = normalize_stats[1] if normalize_stats else None
-        enable_training_augmentation = model_name in {"efficientnet_b0", "resnet50"}
+        training_augmentation_mode = self._resolve_augmentation_mode(model_name, augmentation_mode)
 
         return {
             "train": DataLoader(
@@ -109,7 +116,7 @@ class SplitJsonLoaderFactory:
                     train_samples,
                     normalize_mean=normalize_mean,
                     normalize_std=normalize_std,
-                    training_augmentation=enable_training_augmentation,
+                    augmentation_mode=training_augmentation_mode,
                 ),
                 batch_size=batch_size,
                 shuffle=True,
@@ -137,3 +144,12 @@ class SplitJsonLoaderFactory:
     @staticmethod
     def _read(path: str) -> list[dict[str, Any]]:
         return json.loads(Path(path).read_text(encoding="utf-8"))
+
+    @staticmethod
+    def _resolve_augmentation_mode(model_name: str | None, augmentation_mode: str | None) -> str:
+        if augmentation_mode is not None:
+            if augmentation_mode not in {"none", "flips", "full"}:
+                raise ValueError("augmentation_mode must be one of: none, flips, full")
+            return augmentation_mode
+
+        return "full" if model_name in {"efficientnet_b0", "resnet50"} else "none"

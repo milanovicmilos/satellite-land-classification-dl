@@ -26,6 +26,7 @@ class _FakeDataLoaderFactory:
         split_artifacts: dict[str, str],
         batch_size: int,
         model_name: str | None = None,
+        augmentation_mode: str | None = None,
     ) -> dict[str, object]:
         return {"train": [1], "validation": [2], "test": [3]}
 
@@ -112,6 +113,7 @@ class TrainingOrchestratorTests(unittest.TestCase):
             batch_size=32,
             early_stopping_patience=3,
             split=DatasetSplit(0.7, 0.15, 0.15, 42),
+            augmentation_mode="none",
         )
 
         tmp_dir = Path(tempfile.mkdtemp())
@@ -187,6 +189,7 @@ class TrainingOrchestratorTests(unittest.TestCase):
                 batch_size=8,
                 early_stopping_patience=1,
                 split=DatasetSplit(0.7, 0.15, 0.15, 42),
+                augmentation_mode="flips",
                 resume_from=resume_path.as_posix(),
                 model_options={"freeze_backbone": False},
             )
@@ -223,6 +226,7 @@ class TrainingOrchestratorTests(unittest.TestCase):
             batch_size=8,
             early_stopping_patience=1,
             split=DatasetSplit(0.7, 0.15, 0.15, 42),
+            augmentation_mode="flips",
             resume_from="checkpoints/does-not-exist.pt",
             model_options={"freeze_backbone": False},
         )

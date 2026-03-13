@@ -60,6 +60,7 @@ class TrainingOrchestrator:
             split_artifacts,
             config.batch_size,
             model_name=config.model_name,
+            augmentation_mode=config.augmentation_mode,
         )
 
         training_state = self._trainer.train(
@@ -100,6 +101,7 @@ class TrainingOrchestrator:
                     "scheduler_patience": config.scheduler_patience,
                     "min_learning_rate": config.min_learning_rate,
                     "early_stopping_min_delta": config.early_stopping_min_delta,
+                    "augmentation_mode": config.augmentation_mode,
                 },
                 "training_state": training_state,
             },

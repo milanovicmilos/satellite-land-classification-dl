@@ -57,6 +57,7 @@ class DataLoaderFactory(Protocol):
         split_artifacts: dict[str, str],
         batch_size: int,
         model_name: str | None = None,
+        augmentation_mode: str | None = None,
     ) -> dict[str, Any]:
         ...
 

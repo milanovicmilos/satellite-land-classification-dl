@@ -1,0 +1,358 @@
+﻿{
+    "metadata":  {
+                     "project":  "EuroSAT land-use classification",
+                     "model":  "efficientnet_b0",
+                     "source_of_truth":  "local_full_run",
+                     "generated_at":  "2026-03-13T01:16:08",
+                     "split_seed":  42,
+                     "dataset_root":  "data/EuroSAT",
+                     "note":  "Consolidated final report for EfficientNetB0 (Stage1 + Stage2) with baseline comparison."
+                 },
+    "stage1":  {
+                   "report_path":  "artifacts/reports/efficientnet_b0_stage1_final.json",
+                   "accuracy":  0.9125925925925926,
+                   "macro_f1_score":  0.9086511765996562,
+                   "training_state":  {
+                                          "epochs_requested":  30,
+                                          "epochs_ran":  3,
+                                          "best_validation_loss":  0.2576248941477388,
+                                          "best_validation_f1":  0.9099331813024559,
+                                          "best_epoch":  2,
+                                          "early_stopping_patience":  1,
+                                          "early_stopping_min_delta":  0.001,
+                                          "learning_rate":  0.001,
+                                          "scheduler_factor":  0.5,
+                                          "scheduler_patience":  1,
+                                          "min_learning_rate":  1E-06,
+                                          "batch_size":  16,
+                                          "class_weights":  [
+                                                                0.8999999761581421,
+                                                                0.8999999761581421,
+                                                                0.8999999761581421,
+                                                                1.0800000429153442,
+                                                                1.0800000429153442,
+                                                                1.350000023841858,
+                                                                1.0800000429153442,
+                                                                0.8999999761581421,
+                                                                1.0800000429153442,
+                                                                0.8999999761581421
+                                                            ],
+                                          "epoch_logs":  [
+                                                             {
+                                                                 "epoch":  1,
+                                                                 "train_loss":  0.5225237238956789,
+                                                                 "val_loss":  0.29460461880630395,
+                                                                 "val_acc":  0.9044444444444445,
+                                                                 "val_f1":  0.901507633220781,
+                                                                 "lr":  0.001
+                                                             },
+                                                             {
+                                                                 "epoch":  2,
+                                                                 "train_loss":  0.3418950677523153,
+                                                                 "val_loss":  0.2576248941477388,
+                                                                 "val_acc":  0.9128395061728395,
+                                                                 "val_f1":  0.9099331813024559,
+                                                                 "lr":  0.001
+                                                             },
+                                                             {
+                                                                 "epoch":  3,
+                                                                 "train_loss":  0.3081915878143962,
+                                                                 "val_loss":  0.24455956874120116,
+                                                                 "val_acc":  0.9135802469135802,
+                                                                 "val_f1":  0.9102487355241446,
+                                                                 "lr":  0.001
+                                                             }
+                                                         ]
+                                      },
+                   "hyperparameters":  {
+                                           "epochs":  30,
+                                           "batch_size":  16,
+                                           "early_stopping_patience":  1,
+                                           "learning_rate":  0.001,
+                                           "scheduler_factor":  0.5,
+                                           "scheduler_patience":  0,
+                                           "min_learning_rate":  1E-06,
+                                           "early_stopping_min_delta":  0.001,
+                                           "augmentation_mode":  "flips"
+                                       }
+               },
+    "stage2":  {
+                   "report_path":  "artifacts/reports/efficientnet_b0_stage2_final.json",
+                   "accuracy":  0.9696296296296296,
+                   "macro_f1_score":  0.9689629035384717,
+                   "training_state":  {
+                                          "epochs_requested":  30,
+                                          "epochs_ran":  10,
+                                          "best_validation_loss":  0.16388845280033726,
+                                          "best_validation_f1":  0.9705731512949735,
+                                          "best_epoch":  8,
+                                          "early_stopping_patience":  2,
+                                          "early_stopping_min_delta":  0.001,
+                                          "learning_rate":  0.0001,
+                                          "scheduler_factor":  0.5,
+                                          "scheduler_patience":  1,
+                                          "min_learning_rate":  1E-09,
+                                          "batch_size":  16,
+                                          "class_weights":  [
+                                                                0.8999999761581421,
+                                                                0.8999999761581421,
+                                                                0.8999999761581421,
+                                                                1.0800000429153442,
+                                                                1.0800000429153442,
+                                                                1.350000023841858,
+                                                                1.0800000429153442,
+                                                                0.8999999761581421,
+                                                                1.0800000429153442,
+                                                                0.8999999761581421
+                                                            ],
+                                          "epoch_logs":  [
+                                                             {
+                                                                 "epoch":  1,
+                                                                 "train_loss":  0.7724132339853018,
+                                                                 "val_loss":  0.33105190086002484,
+                                                                 "val_acc":  0.8920987654320988,
+                                                                 "val_f1":  0.8896142054561974,
+                                                                 "lr":  0.0001
+                                                             },
+                                                             {
+                                                                 "epoch":  2,
+                                                                 "train_loss":  0.44335989461496295,
+                                                                 "val_loss":  0.21483165703807391,
+                                                                 "val_acc":  0.928395061728395,
+                                                                 "val_f1":  0.9261917055791852,
+                                                                 "lr":  0.0001
+                                                             },
+                                                             {
+                                                                 "epoch":  3,
+                                                                 "train_loss":  0.336431599786275,
+                                                                 "val_loss":  0.14991849290636022,
+                                                                 "val_acc":  0.9503703703703704,
+                                                                 "val_f1":  0.9481599629334365,
+                                                                 "lr":  0.0001
+                                                             },
+                                                             {
+                                                                 "epoch":  4,
+                                                                 "train_loss":  0.26792537157487617,
+                                                                 "val_loss":  0.11574494660264578,
+                                                                 "val_acc":  0.9632098765432099,
+                                                                 "val_f1":  0.9619284240963497,
+                                                                 "lr":  0.0001
+                                                             },
+                                                             {
+                                                                 "epoch":  5,
+                                                                 "train_loss":  0.23127883991684337,
+                                                                 "val_loss":  0.14634328568705157,
+                                                                 "val_acc":  0.9535802469135802,
+                                                                 "val_f1":  0.9525430587638972,
+                                                                 "lr":  0.0001
+                                                             },
+                                                             {
+                                                                 "epoch":  6,
+                                                                 "train_loss":  0.1896204485303081,
+                                                                 "val_loss":  0.10071258258975595,
+                                                                 "val_acc":  0.9644444444444444,
+                                                                 "val_f1":  0.9629734947895547,
+                                                                 "lr":  0.0001
+                                                             },
+                                                             {
+                                                                 "epoch":  7,
+                                                                 "train_loss":  0.16183091546875675,
+                                                                 "val_loss":  0.10554725539717708,
+                                                                 "val_acc":  0.9651851851851851,
+                                                                 "val_f1":  0.9637841007978706,
+                                                                 "lr":  0.0001
+                                                             },
+                                                             {
+                                                                 "epoch":  8,
+                                                                 "train_loss":  0.151314421487159,
+                                                                 "val_loss":  0.16388845280033726,
+                                                                 "val_acc":  0.9718518518518519,
+                                                                 "val_f1":  0.9705731512949735,
+                                                                 "lr":  5E-05
+                                                             },
+                                                             {
+                                                                 "epoch":  9,
+                                                                 "train_loss":  0.11445915371791401,
+                                                                 "val_loss":  0.0909537611464836,
+                                                                 "val_acc":  0.971358024691358,
+                                                                 "val_f1":  0.970054756261195,
+                                                                 "lr":  5E-05
+                                                             },
+                                                             {
+                                                                 "epoch":  10,
+                                                                 "train_loss":  0.10596235139169785,
+                                                                 "val_loss":  0.10347430382199942,
+                                                                 "val_acc":  0.9725925925925926,
+                                                                 "val_f1":  0.9710927655645293,
+                                                                 "lr":  5E-05
+                                                             }
+                                                         ]
+                                      },
+                   "hyperparameters":  {
+                                           "epochs":  30,
+                                           "batch_size":  16,
+                                           "early_stopping_patience":  2,
+                                           "learning_rate":  0.0001,
+                                           "scheduler_factor":  0.5,
+                                           "scheduler_patience":  1,
+                                           "min_learning_rate":  1E-09,
+                                           "early_stopping_min_delta":  0.001,
+                                           "augmentation_mode":  "flips"
+                                       },
+                   "confusion_matrix":  [
+                                            [
+                                                437,
+                                                0,
+                                                0,
+                                                1,
+                                                0,
+                                                1,
+                                                7,
+                                                0,
+                                                2,
+                                                2
+                                            ],
+                                            [
+                                                1,
+                                                443,
+                                                2,
+                                                0,
+                                                0,
+                                                3,
+                                                0,
+                                                1,
+                                                0,
+                                                0
+                                            ],
+                                            [
+                                                1,
+                                                2,
+                                                433,
+                                                0,
+                                                0,
+                                                2,
+                                                8,
+                                                0,
+                                                0,
+                                                4
+                                            ],
+                                            [
+                                                0,
+                                                1,
+                                                1,
+                                                358,
+                                                4,
+                                                0,
+                                                1,
+                                                1,
+                                                9,
+                                                0
+                                            ],
+                                            [
+                                                1,
+                                                0,
+                                                0,
+                                                1,
+                                                371,
+                                                0,
+                                                0,
+                                                2,
+                                                0,
+                                                0
+                                            ],
+                                            [
+                                                1,
+                                                3,
+                                                4,
+                                                1,
+                                                0,
+                                                288,
+                                                2,
+                                                0,
+                                                0,
+                                                1
+                                            ],
+                                            [
+                                                4,
+                                                0,
+                                                6,
+                                                2,
+                                                2,
+                                                1,
+                                                359,
+                                                0,
+                                                1,
+                                                0
+                                            ],
+                                            [
+                                                1,
+                                                0,
+                                                0,
+                                                0,
+                                                11,
+                                                0,
+                                                2,
+                                                435,
+                                                1,
+                                                0
+                                            ],
+                                            [
+                                                0,
+                                                0,
+                                                1,
+                                                6,
+                                                3,
+                                                0,
+                                                0,
+                                                0,
+                                                363,
+                                                2
+                                            ],
+                                            [
+                                                2,
+                                                0,
+                                                0,
+                                                0,
+                                                2,
+                                                0,
+                                                0,
+                                                0,
+                                                6,
+                                                440
+                                            ]
+                                        ],
+                   "precision":  {
+                                     "AnnualCrop":  0.9754464285714286,
+                                     "Forest":  0.9866369710467706,
+                                     "HerbaceousVegetation":  0.9686800894854586,
+                                     "Highway":  0.9701897018970189,
+                                     "Industrial":  0.9440203562340967,
+                                     "Pasture":  0.976271186440678,
+                                     "PermanentCrop":  0.9472295514511874,
+                                     "Residential":  0.9908883826879271,
+                                     "River":  0.9502617801047121,
+                                     "SeaLake":  0.9799554565701559
+                                 },
+                   "recall":  {
+                                  "AnnualCrop":  0.9711111111111111,
+                                  "Forest":  0.9844444444444445,
+                                  "HerbaceousVegetation":  0.9622222222222222,
+                                  "Highway":  0.9546666666666667,
+                                  "Industrial":  0.9893333333333333,
+                                  "Pasture":  0.96,
+                                  "PermanentCrop":  0.9573333333333334,
+                                  "Residential":  0.9666666666666667,
+                                  "River":  0.968,
+                                  "SeaLake":  0.9777777777777777
+                              }
+               },
+    "comparison_vs_baseline":  {
+                                   "baseline_report_path":  "artifacts/reports/baseline_cnn_full.json",
+                                   "baseline_accuracy":  0.8958024691358024,
+                                   "baseline_macro_f1_score":  0.891201022896469,
+                                   "stage2_accuracy":  0.9696296296296296,
+                                   "stage2_macro_f1_score":  0.9689629035384717,
+                                   "delta_accuracy":  0.0738271604938272,
+                                   "delta_macro_f1_score":  0.077761880642002623
+                               }
+}

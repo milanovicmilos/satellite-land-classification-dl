@@ -1,0 +1,29 @@
+{
+  "experiment_name": "efficientnet-b0-stage1-optimized",
+  "dataset_root": "data/EuroSAT",
+  "split": {
+    "train_ratio": 0.7,
+    "validation_ratio": 0.15,
+    "test_ratio": 0.15,
+    "seed": 42,
+    "stratified": true
+  },
+  "training": {
+    "epochs": 30,
+    "batch_size": 16,
+    "early_stopping_patience": 1,
+    "early_stopping_min_delta": 0.001,
+    "learning_rate": 0.001,
+    "scheduler_factor": 0.5,
+    "scheduler_patience": 0,
+    "min_learning_rate": 0.000001,
+    "augmentation_mode": "flips"
+  },
+  "model": {
+    "name": "efficientnet_b0",
+    "options": {
+      "use_pretrained": true,
+      "freeze_backbone": true
+    }
+  }
+}

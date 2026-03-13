@@ -142,6 +142,45 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         finally:
             shutil.rmtree(tmp_dir)
 
+    def test_split_loader_supports_flips_only_augmentation_mode(self) -> None:
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train = tmp_dir / "train_split.json"
+            validation = tmp_dir / "validation_split.json"
+            test = tmp_dir / "test_split.json"
+
+            image_path = tmp_dir / "sample.jpg"
+            image = Image.new("RGB", (64, 64), (255, 255, 255))
+            image.save(image_path.as_posix(), format="JPEG")
+
+            payload = json.dumps([{"path": image_path.as_posix(), "class_index": 0}])
+            train.write_text(payload, encoding="utf-8")
+            validation.write_text(payload, encoding="utf-8")
+            test.write_text(payload, encoding="utf-8")
+
+            split_paths = {
+                "train": train.as_posix(),
+                "validation": validation.as_posix(),
+                "test": test.as_posix(),
+            }
+
+            loaders = SplitJsonLoaderFactory().create(
+                split_paths,
+                batch_size=1,
+                model_name="efficientnet_b0",
+                augmentation_mode="flips",
+            )
+
+            train_transforms = loaders["train"].dataset._transform.transforms
+            transform_names = [type(transform).__name__ for transform in train_transforms]
+
+            self.assertIn("RandomHorizontalFlip", transform_names)
+            self.assertIn("RandomVerticalFlip", transform_names)
+            self.assertNotIn("RandomRotation", transform_names)
+            self.assertNotIn("RandomAffine", transform_names)
+        finally:
+            shutil.rmtree(tmp_dir)
+
     def test_split_loader_uses_registry_normalization_for_future_models(self) -> None:
         tmp_dir = Path(tempfile.mkdtemp())
         try:

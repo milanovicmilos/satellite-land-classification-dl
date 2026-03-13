@@ -21,6 +21,7 @@ class TrainingConfig:
     scheduler_patience: int | None = None
     min_learning_rate: float = 1e-6
     early_stopping_min_delta: float = 0.0
+    augmentation_mode: str | None = None
     resume_from: str | None = None
     model_options: dict[str, object] = field(default_factory=dict)
 

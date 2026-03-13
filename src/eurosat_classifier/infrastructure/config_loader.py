@@ -57,6 +57,7 @@ class JsonConfigLoader:
             scheduler_patience=raw_config["training"].get("scheduler_patience"),
             min_learning_rate=raw_config["training"].get("min_learning_rate", 1e-6),
             early_stopping_min_delta=raw_config["training"].get("early_stopping_min_delta", 0.0),
+            augmentation_mode=raw_config["training"].get("augmentation_mode"),
             split=split,
             resume_from=raw_config["training"].get("resume_from"),
             model_options=raw_config["model"].get("options", {}),
