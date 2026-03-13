@@ -41,7 +41,7 @@ class BaselineTrainer:
         criterion = nn.CrossEntropyLoss(weight=class_weights)
         effective_learning_rate = learning_rate or self._default_learning_rate
         effective_scheduler_patience = (
-            scheduler_patience if scheduler_patience is not None else max(1, early_stopping_patience // 2)
+            scheduler_patience if scheduler_patience is not None else early_stopping_patience // 2
         )
 
         optimizer = Adam(model.parameters(), lr=effective_learning_rate)
@@ -49,7 +49,7 @@ class BaselineTrainer:
             optimizer,
             mode="min",
             factor=scheduler_factor,
-            patience=max(1, effective_scheduler_patience),
+            patience=effective_scheduler_patience,
             min_lr=min_learning_rate,
         )
 
@@ -110,7 +110,7 @@ class BaselineTrainer:
             "early_stopping_min_delta": early_stopping_min_delta,
             "learning_rate": float(effective_learning_rate),
             "scheduler_factor": float(scheduler_factor),
-            "scheduler_patience": int(max(1, effective_scheduler_patience)),
+            "scheduler_patience": int(effective_scheduler_patience),
             "min_learning_rate": float(min_learning_rate),
             "batch_size": int(getattr(train_split, "batch_size", 0) or 0),
             "class_weights": [float(value) for value in class_weights.detach().cpu().tolist()],

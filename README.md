@@ -12,7 +12,7 @@ Python project for EuroSAT land-use classification with a baseline CNN, Efficien
 ## Methodology
 
 - Baseline full run uses `early_stopping_patience=10` as anti-overfitting protection.
-- This allows convergence while preserving scientific validity by stopping when validation loss stops improving.
+- This allows convergence while preserving scientific validity by stopping when Validation Macro F1-score stops improving.
 
 ## Team Ownership
 

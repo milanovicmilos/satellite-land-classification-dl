@@ -14,7 +14,7 @@ This project is EuroSAT land-use classification in Python with stratified 70/15/
 2. Implemented augmentation routing in `SplitJsonLoaderFactory` with explicit validation for `none`, `flips`, and `full`.
 3. Strengthened reproducibility by enabling deterministic PyTorch algorithms in seed setup.
 4. Archived legacy/smoke reports and temporary training logs from active reports folder.
-5. Generated consolidated final artifact: `artifacts/final/efficientnet_b0_final_full.json`.
+5. Generated consolidated final artifact: `results/final/efficientnet_b0_final_full.json`.
 
 ## Differential Analysis Summary
 ### Kaggle Poor Stage 2 (from archived Kaggle full run)
