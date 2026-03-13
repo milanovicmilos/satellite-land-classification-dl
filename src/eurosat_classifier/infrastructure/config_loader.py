@@ -28,6 +28,17 @@ class JsonConfigLoader:
                 merged[key] = value
         return merged
 
+    @staticmethod
+    def _resolve_augmentation_mode(raw_config: dict[str, Any]) -> str | None:
+        training_config = raw_config.get("training", {})
+        resolved_mode = training_config.get("augmentation_mode")
+        model_name = str(raw_config.get("model", {}).get("name", "")).lower()
+
+        if resolved_mode is None and model_name.startswith("efficientnet"):
+            return "full"
+
+        return resolved_mode
+
     def load(self, path: str) -> TrainingConfig:
         config_data: dict[str, Any] = {}
 
@@ -57,7 +68,7 @@ class JsonConfigLoader:
             scheduler_patience=raw_config["training"].get("scheduler_patience"),
             min_learning_rate=raw_config["training"].get("min_learning_rate", 1e-6),
             early_stopping_min_delta=raw_config["training"].get("early_stopping_min_delta", 0.0),
-            augmentation_mode=raw_config["training"].get("augmentation_mode"),
+            augmentation_mode=self._resolve_augmentation_mode(raw_config),
             split=split,
             resume_from=raw_config["training"].get("resume_from"),
             model_options=raw_config["model"].get("options", {}),

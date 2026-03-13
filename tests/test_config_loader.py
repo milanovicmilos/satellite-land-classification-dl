@@ -100,6 +100,50 @@ class JsonConfigLoaderTests(unittest.TestCase):
             "checkpoints/efficientnet_b0/stage1/best_checkpoint.pt",
         )
 
+    def test_load_sets_full_augmentation_for_efficientnet_when_omitted(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        payload = {
+            "experiment_name": "eff-omitted-augmentation",
+            "model": {"name": "efficientnet_b0"},
+            "training": {"augmentation_mode": None},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertEqual(config.augmentation_mode, "full")
+
+    def test_load_keeps_explicit_augmentation_mode_for_efficientnet(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        payload = {
+            "experiment_name": "eff-explicit-augmentation",
+            "model": {"name": "efficientnet_b0"},
+            "training": {"augmentation_mode": "flips"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertEqual(config.augmentation_mode, "flips")
+
 
 if __name__ == "__main__":
     unittest.main()

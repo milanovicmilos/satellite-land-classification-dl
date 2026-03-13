@@ -310,6 +310,50 @@ class BaselineEngineComponentsTests(unittest.TestCase):
 
         self.assertEqual(state["scheduler_patience"], 0)
 
+    def test_trainer_raises_for_non_positive_learning_rate(self) -> None:
+        model = SharedModelFactory().create("baseline_cnn")
+        trainer = BaselineTrainer()
+
+        tmp_dir = Path(tempfile.mkdtemp())
+        try:
+            train_split = tmp_dir / "train_split.json"
+            validation_split = tmp_dir / "validation_split.json"
+            test_split = tmp_dir / "test_split.json"
+
+            samples: list[dict[str, object]] = []
+            for idx in range(6):
+                image_path = tmp_dir / f"lr_validation_{idx}.jpg"
+                self._create_image(image_path)
+                samples.append({"path": image_path.as_posix(), "class_index": idx % 3})
+
+            train_split.write_text(json.dumps(samples[:4]), encoding="utf-8")
+            validation_split.write_text(json.dumps(samples[4:5]), encoding="utf-8")
+            test_split.write_text(json.dumps(samples[3:6]), encoding="utf-8")
+
+            loaders = SplitJsonLoaderFactory().create(
+                {
+                    "train": train_split.as_posix(),
+                    "validation": validation_split.as_posix(),
+                    "test": test_split.as_posix(),
+                },
+                batch_size=2,
+            )
+
+            with self.assertRaises(ValueError):
+                trainer.train(
+                    model,
+                    loaders,
+                    epochs=2,
+                    early_stopping_patience=1,
+                    learning_rate=0.0,
+                    scheduler_factor=0.5,
+                    scheduler_patience=0,
+                    min_learning_rate=1e-6,
+                    early_stopping_min_delta=0.0,
+                )
+        finally:
+            shutil.rmtree(tmp_dir)
+
     def test_checkpoint_metadata_contains_hyperparameters(self) -> None:
         model = SharedModelFactory().create("baseline_cnn")
         store = JsonCheckpointStore()

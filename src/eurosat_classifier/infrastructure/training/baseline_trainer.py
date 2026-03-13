@@ -24,11 +24,11 @@ class BaselineTrainer:
         loaders,
         epochs: int,
         early_stopping_patience: int,
-        learning_rate: float,
-        scheduler_factor: float,
-        scheduler_patience: int | None,
-        min_learning_rate: float,
-        early_stopping_min_delta: float,
+        learning_rate: float | None = None,
+        scheduler_factor: float = 0.5,
+        scheduler_patience: int | None = None,
+        min_learning_rate: float = 1e-6,
+        early_stopping_min_delta: float = 0.0,
     ) -> dict[str, object]:
         train_split = loaders["train"]
         if not train_split:
@@ -39,7 +39,12 @@ class BaselineTrainer:
 
         class_weights = self._compute_class_weights(train_split, model.num_classes, device)
         criterion = nn.CrossEntropyLoss(weight=class_weights)
-        effective_learning_rate = learning_rate or self._default_learning_rate
+        if learning_rate is None:
+            effective_learning_rate = self._default_learning_rate
+        elif learning_rate <= 0:
+            raise ValueError("learning_rate must be greater than 0.")
+        else:
+            effective_learning_rate = learning_rate
         effective_scheduler_patience = (
             scheduler_patience if scheduler_patience is not None else early_stopping_patience // 2
         )
