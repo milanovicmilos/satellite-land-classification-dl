@@ -93,15 +93,25 @@ class TrainingOrchestrator:
                 "split_seed": config.split.seed,
                 "checkpoint_path": checkpoint_path,
                 "hyperparameters": {
-                    "epochs": config.epochs,
-                    "batch_size": config.batch_size,
-                    "early_stopping_patience": config.early_stopping_patience,
-                    "learning_rate": config.learning_rate,
-                    "scheduler_factor": config.scheduler_factor,
-                    "scheduler_patience": config.scheduler_patience,
-                    "min_learning_rate": config.min_learning_rate,
-                    "early_stopping_min_delta": config.early_stopping_min_delta,
-                    "augmentation_mode": config.augmentation_mode,
+                    "epochs": training_state.get("epochs_requested", config.epochs),
+                    "batch_size": training_state.get("batch_size", config.batch_size),
+                    "early_stopping_patience": training_state.get(
+                        "early_stopping_patience", config.early_stopping_patience
+                    ),
+                    "learning_rate": training_state.get("learning_rate", config.learning_rate),
+                    "scheduler_factor": training_state.get("scheduler_factor", config.scheduler_factor),
+                    "scheduler_patience": training_state.get(
+                        "scheduler_patience", config.scheduler_patience
+                    ),
+                    "min_learning_rate": training_state.get(
+                        "min_learning_rate", config.min_learning_rate
+                    ),
+                    "early_stopping_min_delta": training_state.get(
+                        "early_stopping_min_delta", config.early_stopping_min_delta
+                    ),
+                    "augmentation_mode": training_state.get(
+                        "augmentation_mode", config.augmentation_mode
+                    ),
                 },
                 "training_state": training_state,
             },

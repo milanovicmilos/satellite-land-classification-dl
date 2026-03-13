@@ -45,11 +45,17 @@ class _FakeTrainer:
         early_stopping_min_delta: float,
     ) -> dict[str, object]:
         return {
+            "epochs_requested": 10,
             "epochs_ran": 3,
             "best_validation_loss": 0.4,
-            "patience": early_stopping_patience,
-            "learning_rate": learning_rate,
-            "batch_size": 32,
+            "early_stopping_patience": 7,
+            "early_stopping_min_delta": 0.004,
+            "learning_rate": 0.123,
+            "scheduler_factor": 0.25,
+            "scheduler_patience": 0,
+            "min_learning_rate": 1e-7,
+            "batch_size": 99,
+            "augmentation_mode": "flips",
             "epoch_logs": [
                 {
                     "epoch": 1,
@@ -138,6 +144,9 @@ class TrainingOrchestratorTests(unittest.TestCase):
             report_content = Path(result["report_path"]).read_text(encoding="utf-8")
             self.assertIn("hyperparameters", report_content)
             self.assertIn("epoch_logs", report_content)
+            self.assertIn("'learning_rate': 0.123", report_content)
+            self.assertIn("'scheduler_patience': 0", report_content)
+            self.assertIn("'batch_size': 99", report_content)
         finally:
             shutil.rmtree(tmp_dir)
 
