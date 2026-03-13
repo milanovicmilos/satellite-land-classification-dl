@@ -24,9 +24,9 @@ class BaselineTrainer:
         loaders,
         epochs: int,
         early_stopping_patience: int,
-        learning_rate: float | None = None,
+        learning_rate: float,
         scheduler_factor: float = 0.5,
-        scheduler_patience: int | None = None,
+        scheduler_patience: int = 0,
         min_learning_rate: float = 1e-6,
         early_stopping_min_delta: float = 0.0,
     ) -> dict[str, object]:
@@ -34,20 +34,20 @@ class BaselineTrainer:
         if not train_split:
             raise ValueError("Train split is empty; cannot train baseline model.")
 
+        if learning_rate <= 0:
+            raise ValueError("learning_rate must be greater than 0.")
+        if not (0 < scheduler_factor <= 1):
+            raise ValueError("scheduler_factor must be in the interval (0, 1].")
+        if early_stopping_min_delta < 0:
+            raise ValueError("early_stopping_min_delta must be non-negative.")
+
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model.to(device)
 
         class_weights = self._compute_class_weights(train_split, model.num_classes, device)
         criterion = nn.CrossEntropyLoss(weight=class_weights)
-        if learning_rate is None:
-            effective_learning_rate = self._default_learning_rate
-        elif learning_rate <= 0:
-            raise ValueError("learning_rate must be greater than 0.")
-        else:
-            effective_learning_rate = learning_rate
-        effective_scheduler_patience = (
-            scheduler_patience if scheduler_patience is not None else early_stopping_patience // 2
-        )
+        effective_learning_rate = learning_rate
+        effective_scheduler_patience = scheduler_patience
 
         optimizer = Adam(model.parameters(), lr=effective_learning_rate)
         scheduler = ReduceLROnPlateau(

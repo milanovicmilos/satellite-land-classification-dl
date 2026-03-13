@@ -1,4 +1,4 @@
-﻿# EfficientNetB0 Revision Change Log (Kaggle vs Local)
+# EfficientNetB0 Revision Change Log (Kaggle vs Local)
 
 ## Project Context
 This project is EuroSAT land-use classification in Python with stratified 70/15/15 split, fixed seed 42, and evaluation by accuracy, macro F1-score, confusion matrix, precision, and recall.
@@ -62,5 +62,5 @@ All older smoke/temporary/legacy reports were moved into:
 - Residual caveat: exact cross-hardware bitwise equality can still vary by driver/CUDA stack and nondeterministic ops reported in warning mode.
 
 ## Team Boundary Note
-This revision only updates shared infrastructure and EfficientNetB0 path (MiloÅ¡ scope), while preserving ResNet50 ownership boundary for Bojan.
+This revision only updates shared infrastructure and EfficientNetB0 path (Miloš scope), while preserving ResNet50 ownership boundary for Bojan.
 

@@ -40,7 +40,7 @@ class _FakeTrainer:
         early_stopping_patience: int,
         learning_rate: float,
         scheduler_factor: float,
-        scheduler_patience: int | None,
+        scheduler_patience: int,
         min_learning_rate: float,
         early_stopping_min_delta: float,
     ) -> dict[str, object]:
@@ -160,7 +160,7 @@ class TrainingOrchestratorTests(unittest.TestCase):
                 early_stopping_patience: int,
                 learning_rate: float,
                 scheduler_factor: float,
-                scheduler_patience: int | None,
+                scheduler_patience: int,
                 min_learning_rate: float,
                 early_stopping_min_delta: float,
             ):

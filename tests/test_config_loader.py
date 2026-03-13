@@ -144,6 +144,28 @@ class JsonConfigLoaderTests(unittest.TestCase):
 
         self.assertEqual(config.augmentation_mode, "flips")
 
+    def test_load_keeps_null_augmentation_for_non_efficientnet_when_omitted(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        payload = {
+            "experiment_name": "resnet-omitted-augmentation",
+            "model": {"name": "resnet50"},
+            "training": {"augmentation_mode": None},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertIsNone(config.augmentation_mode)
+
 
 if __name__ == "__main__":
     unittest.main()

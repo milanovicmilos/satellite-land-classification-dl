@@ -18,7 +18,7 @@ class TrainingConfig:
     split: DatasetSplit
     learning_rate: float = 1e-3
     scheduler_factor: float = 0.5
-    scheduler_patience: int | None = None
+    scheduler_patience: int = 0
     min_learning_rate: float = 1e-6
     early_stopping_min_delta: float = 0.0
     augmentation_mode: str | None = None
