@@ -9,6 +9,11 @@ Python project for EuroSAT land-use classification with a baseline CNN, Efficien
 - Evaluation: stratified train/validation/test split with a fixed seed.
 - Metrics: accuracy, macro F1-score, confusion matrix, per-class precision, and per-class recall.
 
+## Methodology
+
+- Baseline full run uses `early_stopping_patience=10` as anti-overfitting protection.
+- This allows convergence while preserving scientific validity by stopping when validation loss stops improving.
+
 ## Team Ownership
 
 - Miloš Milanović: EfficientNetB0 and shared infrastructure.
@@ -35,10 +40,21 @@ The following commands are intended to work in the current scaffold.
 
 ```powershell
 c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m unittest discover -s tests
-$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --dry-run --config configs/baseline.example.json
-$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --prepare-dataset --config configs/baseline.example.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits
-$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --run-baseline --config configs/baseline.example.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/baseline_metrics.json --checkpoints-output checkpoints/baseline
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --dry-run --config configs/baseline_cnn_full.json
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --prepare-dataset --config configs/baseline_cnn_full.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --run-baseline --config configs/baseline_cnn_full.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/baseline_cnn_full.json --checkpoints-output checkpoints/baseline_cnn
+
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage1.optimized.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage1_final.json --checkpoints-output checkpoints/efficientnet_b0/stage1
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage2.optimized.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage2_final.json --checkpoints-output checkpoints/efficientnet_b0/stage2
 ```
+
+## Active Components
+
+| Component Type | Active Files |
+| --- | --- |
+| Configs | `configs/baseline_cnn_full.json`, `configs/efficientnet_b0.stage1.optimized.json`, `configs/efficientnet_b0.stage2.optimized.json`, `configs/experiment.defaults.json` |
+| Notebooks | `notebooks/eurosat_baseline_kaggle.ipynb`, `notebooks/eurosat_efficientnet_kaggle.ipynb` |
+| Reports | `artifacts/reports/baseline_cnn_full.json`, `artifacts/reports/efficientnet_b0_stage1_final.json`, `artifacts/reports/efficientnet_b0_stage2_final.json`, `results/final/efficientnet_b0_final_full.json` |
 
 ## Reproducibility Assets (Phase 1)
 

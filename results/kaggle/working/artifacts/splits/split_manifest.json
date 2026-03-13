@@ -1,6 +1,0 @@
-{
-  "seed": 42,
-  "train_samples": 18900,
-  "validation_samples": 4050,
-  "test_samples": 4050
-}

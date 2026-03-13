@@ -318,7 +318,7 @@ class BaselineEngineComponentsTests(unittest.TestCase):
     def test_efficientnet_stage1_smoke_runs_one_epoch(self) -> None:
         config = JsonConfigLoader(
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
-        ).load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.json"))
+        ).load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.optimized.json"))
 
         tmp_dir = Path(tempfile.mkdtemp())
         try:
