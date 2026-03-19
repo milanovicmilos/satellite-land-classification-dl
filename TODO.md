@@ -174,15 +174,30 @@ Goal:
 - Keep clean extension points ready for Bojan's implementation without crossing ownership boundaries.
 
 Work items:
-- [ ] Keep interface and registry hooks ready for ResNet50.
-- [ ] Provide config template and integration checklist.
-- [ ] Do not implement Bojan-owned model internals unless explicitly requested.
+- [x] Keep interface and registry hooks ready for ResNet50.
+- [x] Provide config template and integration checklist.
+- [x] Do not implement Bojan-owned model internals unless explicitly requested.
 
 Folders and files:
 - Existing: `src/eurosat_classifier/infrastructure/models/registry.py`
 - Existing: `.github/copilot-instructions.md`
-- Planned: `configs/resnet50.template.json`
-- Planned: `docs/resnet50_integration_contract.md`
+- Existing: `src/eurosat_classifier/infrastructure/models/resnet50.py`
+- Existing: `configs/resnet50.template.json`
+- Existing: `configs/resnet50.stage1.optimized.json`
+- Existing: `configs/resnet50.stage2.optimized.json`
+- Existing: `docs/resnet50_integration_contract.md`
+- Existing: `tests/test_baseline_engine_components.py`
+- Existing: `tests/test_config_loader.py`
+
+Implementation status:
+- `src/eurosat_classifier/infrastructure/models/resnet50.py` (ResNet50 adapter with ImageNet preload support and staged freeze/unfreeze controls)
+- `src/eurosat_classifier/infrastructure/models/registry.py` (ResNet50 status promoted from reserved placeholder to active shared-model entry)
+- `configs/resnet50.template.json` (single-file template for reproducible ResNet50 experiments)
+- `configs/resnet50.stage1.optimized.json` (frozen-backbone stage with pretrained initialization)
+- `configs/resnet50.stage2.optimized.json` (unfrozen stage with checkpoint resume path)
+- `docs/resnet50_integration_contract.md` (ownership-safe integration checklist and runtime contract)
+- `tests/test_baseline_engine_components.py` (factory + forward/freeze coverage for ResNet50)
+- `tests/test_config_loader.py` (ResNet50 stage config and resume path parsing coverage)
 
 ## 7. Quality Gates (Tests, Lint, Type Checks)
 
