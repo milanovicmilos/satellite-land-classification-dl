@@ -43,6 +43,13 @@ class BaselineEngineComponentsTests(unittest.TestCase):
 
         self.assertEqual(model.num_classes, 10)
 
+    def test_model_factory_creates_resnet50_model(self) -> None:
+        factory = SharedModelFactory()
+
+        model = factory.create("resnet50")
+
+        self.assertEqual(model.num_classes, 10)
+
     def test_efficientnet_forward_shape_and_backbone_freeze_controls(self) -> None:
         model = SharedModelFactory().create("efficientnet_b0")
 
@@ -53,6 +60,31 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         model.set_backbone_trainable(True)
         self.assertFalse(model.backbone_frozen)
         self.assertTrue(all(p.requires_grad for p in model.backbone.features.parameters()))
+
+        inputs = torch.zeros((2, 3, 64, 64), dtype=torch.float32)
+        outputs = model(inputs)
+        self.assertEqual(tuple(outputs.shape), (2, 10))
+
+    def test_resnet50_forward_shape_and_backbone_freeze_controls(self) -> None:
+        model = SharedModelFactory().create(
+            "resnet50",
+            {"use_pretrained": False, "freeze_backbone": False},
+        )
+
+        model.set_backbone_trainable(False)
+        self.assertTrue(model.backbone_frozen)
+        self.assertTrue(
+            all(
+                not parameter.requires_grad
+                for name, parameter in model.backbone.named_parameters()
+                if not name.startswith("fc.")
+            )
+        )
+        self.assertTrue(all(parameter.requires_grad for parameter in model.backbone.fc.parameters()))
+
+        model.set_backbone_trainable(True)
+        self.assertFalse(model.backbone_frozen)
+        self.assertTrue(all(parameter.requires_grad for parameter in model.backbone.parameters()))
 
         inputs = torch.zeros((2, 3, 64, 64), dtype=torch.float32)
         outputs = model(inputs)

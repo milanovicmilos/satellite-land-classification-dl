@@ -100,6 +100,28 @@ class JsonConfigLoaderTests(unittest.TestCase):
             "checkpoints/efficientnet_b0/stage1/best_checkpoint.pt",
         )
 
+    def test_load_reads_resnet_stage1_options(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        config = loader.load(str(PROJECT_ROOT / "configs" / "resnet50.stage1.optimized.json"))
+
+        self.assertEqual(config.model_name, "resnet50")
+        self.assertTrue(bool(config.model_options.get("freeze_backbone")))
+        self.assertTrue(bool(config.model_options.get("use_pretrained")))
+
+    def test_load_reads_resnet_stage2_resume_path(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        config = loader.load(str(PROJECT_ROOT / "configs" / "resnet50.stage2.optimized.json"))
+
+        self.assertEqual(config.model_name, "resnet50")
+        self.assertFalse(bool(config.model_options.get("freeze_backbone")))
+        self.assertEqual(config.resume_from, "checkpoints/resnet50/stage1/best_checkpoint.pt")
+
     def test_load_sets_full_augmentation_for_efficientnet_when_omitted(self) -> None:
         loader = JsonConfigLoader(
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
