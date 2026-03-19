@@ -15,7 +15,7 @@ NormalizationStats = tuple[tuple[float, float, float], tuple[float, float, float
 SUPPORTED_SHARED_MODELS = {
     "baseline_cnn": "Shared baseline CNN implementation.",
     "efficientnet_b0": "Milos-owned EfficientNetB0 implementation with staged fine-tuning support.",
-    "resnet50": "Reserved for Bojan's ResNet50 implementation.",
+    "resnet50": "Bojan-owned ResNet50 implementation with staged fine-tuning support.",
 }
 
 MODEL_NORMALIZATION: dict[str, NormalizationStats] = {
