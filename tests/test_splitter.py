@@ -85,6 +85,27 @@ class StratifiedSplitterTests(unittest.TestCase):
         finally:
             shutil.rmtree(tmp_dir)
 
+    def test_split_raises_for_non_stratified_config(self) -> None:
+        dataset_index = self._build_index(samples_per_class=5)
+        config = DatasetSplit(0.6, 0.2, 0.2, seed=7, stratified=False)
+
+        with self.assertRaises(ValueError):
+            StratifiedSplitter().split(dataset_index, config)
+
+    def test_split_raises_when_class_has_less_than_three_samples(self) -> None:
+        dataset_index = self._build_index(samples_per_class=2)
+        config = DatasetSplit(0.6, 0.2, 0.2, seed=7, stratified=True)
+
+        with self.assertRaises(ValueError):
+            StratifiedSplitter().split(dataset_index, config)
+
+    def test_split_raises_when_ratio_creates_empty_partition(self) -> None:
+        dataset_index = self._build_index(samples_per_class=3)
+        config = DatasetSplit(0.7, 0.15, 0.15, seed=7, stratified=True)
+
+        with self.assertRaises(ValueError):
+            StratifiedSplitter().split(dataset_index, config)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -205,18 +205,30 @@ Goal:
 - Enforce reliability and detect regressions before long training runs.
 
 Work items:
-- [ ] Expand unit tests for split logic, config validation, and metrics.
-- [ ] Add smoke tests for CLI and short training path.
-- [ ] Add lint and type-check tooling configuration.
+- [x] Expand unit tests for split logic, config validation, and metrics.
+- [x] Add smoke tests for CLI and short training path.
+- [x] Add lint and type-check tooling configuration.
 
 Folders and files:
 - Existing: `tests/test_cli.py`
 - Existing: `tests/test_config_loader.py`
+- Existing: `tests/test_splitter.py`
+- Existing: `tests/test_metrics_calculator.py`
 - Existing: `pyproject.toml`
-- Planned: `tests/test_training_smoke.py`
-- Planned: `pyproject.toml` (tool sections for lint/type/test)
-- Planned: `requirements-dev.txt`
-- Planned: `.github/workflows/ci.yml`
+- Existing: `tests/test_training_smoke.py`
+- Existing: `pyproject.toml` (tool sections for pytest/ruff/mypy)
+- Existing: `pyproject.toml` (`project.optional-dependencies.dev`)
+- Existing: `.github/workflows/ci.yml`
+
+Implementation status:
+- `tests/test_splitter.py` (extended split edge-case coverage: non-stratified mode, undersized classes, empty partition validation)
+- `tests/test_config_loader.py` (extended configuration coverage: scheduler patience derivation and model options defaults)
+- `tests/test_metrics_calculator.py` (extended metric validation coverage for empty classes and invalid predicted indices)
+- `tests/test_training_smoke.py` (new smoke tests for CLI dataset preparation and short baseline training path)
+- `src/eurosat_classifier/entrypoints/cli.py` (type-check friendly use-case naming in CLI branches)
+- `pyproject.toml` (pytest, ruff, and mypy tool configuration + `project.optional-dependencies.dev`)
+- `.github/workflows/ci.yml` (CI quality-gates workflow: install, lint, type-check, tests)
+- Local checks executed successfully: `pytest -q tests`, `ruff check src tests`, and `mypy src`
 
 ## 8. Packaging, Inference, And Production Rollout
 
@@ -255,9 +267,9 @@ Folders and files:
 
 ## Current Phase Recommendation
 
-Start with Phase 7.
+Start with Phase 8.
 
 Reason:
-- Phases 1, 2, 3, 4, and 5 are completed and synchronized in this roadmap.
-- Shared engine robustness for resume and checkpoint compatibility has dedicated tests.
-- Next highest value is expanding quality gates (tests, lint, type checks) before broader integration work.
+- Phases 1, 2, 3, 4, 5, 6, and 7 are completed and synchronized in this roadmap.
+- Quality gates are now in place through local validation and CI configuration.
+- Next highest value is packaging, inference entrypoints, and production rollout readiness.
