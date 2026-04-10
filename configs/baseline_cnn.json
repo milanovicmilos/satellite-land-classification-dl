@@ -12,7 +12,8 @@
     "epochs": 50,
     "batch_size": 16,
     "early_stopping_patience": 10,
-    "augmentation_mode": "none"
+    "learning_rate": 0.0005,
+    "augmentation_mode": "flips"
   },
   "model": {
     "name": "baseline_cnn"
