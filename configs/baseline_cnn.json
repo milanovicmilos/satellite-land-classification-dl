@@ -1,5 +1,5 @@
 {
-  "experiment_name": "baseline-cnn-full",
+  "experiment_name": "baseline-cnn",
   "dataset_root": "data/EuroSAT",
   "split": {
     "train_ratio": 0.7,

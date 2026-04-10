@@ -15,9 +15,11 @@ class JsonConfigLoader:
         self,
         defaults_path: str | None = None,
         split_seed_override: int | None = None,
+        config_overrides: dict[str, Any] | None = None,
     ) -> None:
         self._defaults_path = defaults_path
         self._split_seed_override = split_seed_override
+        self._config_overrides = config_overrides
 
     @staticmethod
     def _read_json(path: str) -> dict[str, Any]:
@@ -52,6 +54,8 @@ class JsonConfigLoader:
 
         user_config = self._read_json(path)
         raw_config = self._deep_merge(config_data, user_config)
+        if self._config_overrides is not None:
+            raw_config = self._deep_merge(raw_config, self._config_overrides)
         if self._split_seed_override is not None:
             raw_config["split"]["seed"] = int(self._split_seed_override)
         training_config = raw_config["training"]

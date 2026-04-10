@@ -18,9 +18,9 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "baseline_cnn_full.json"))
+        config = loader.load(str(PROJECT_ROOT / "configs" / "baseline_cnn.json"))
 
-        self.assertEqual(config.experiment_name, "baseline-cnn-full")
+        self.assertEqual(config.experiment_name, "baseline-cnn")
         self.assertEqual(config.model_name, "baseline_cnn")
         self.assertEqual(config.model_options, {})
         self.assertEqual(config.split.seed, 42)
@@ -80,7 +80,7 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.optimized.json"))
+        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.json"))
 
         self.assertEqual(config.model_name, "efficientnet_b0")
         self.assertTrue(bool(config.model_options.get("freeze_backbone")))
@@ -91,7 +91,7 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage2.optimized.json"))
+        config = loader.load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage2.json"))
 
         self.assertEqual(config.model_name, "efficientnet_b0")
         self.assertFalse(bool(config.model_options.get("freeze_backbone")))
@@ -105,7 +105,7 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "resnet50.stage1.optimized.json"))
+        config = loader.load(str(PROJECT_ROOT / "configs" / "resnet50.stage1.json"))
 
         self.assertEqual(config.model_name, "resnet50")
         self.assertTrue(bool(config.model_options.get("freeze_backbone")))
@@ -116,7 +116,7 @@ class JsonConfigLoaderTests(unittest.TestCase):
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         )
 
-        config = loader.load(str(PROJECT_ROOT / "configs" / "resnet50.stage2.optimized.json"))
+        config = loader.load(str(PROJECT_ROOT / "configs" / "resnet50.stage2.json"))
 
         self.assertEqual(config.model_name, "resnet50")
         self.assertFalse(bool(config.model_options.get("freeze_backbone")))
@@ -261,6 +261,34 @@ class JsonConfigLoaderTests(unittest.TestCase):
             Path(config_path).unlink(missing_ok=True)
 
         self.assertEqual(config.split.seed, 123)
+
+    def test_load_applies_nested_config_overrides(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json"),
+            config_overrides={
+                "training": {
+                    "epochs": 3,
+                    "batch_size": 8,
+                    "augmentation_mode": "flips",
+                },
+                "model": {
+                    "name": "efficientnet_b0",
+                    "options": {
+                        "use_pretrained": True,
+                        "freeze_backbone": True,
+                    },
+                },
+            },
+        )
+
+        config = loader.load(str(PROJECT_ROOT / "configs" / "baseline_cnn.json"))
+
+        self.assertEqual(config.model_name, "efficientnet_b0")
+        self.assertEqual(config.epochs, 3)
+        self.assertEqual(config.batch_size, 8)
+        self.assertEqual(config.augmentation_mode, "flips")
+        self.assertTrue(bool(config.model_options.get("use_pretrained")))
+        self.assertTrue(bool(config.model_options.get("freeze_backbone")))
 
 
 if __name__ == "__main__":

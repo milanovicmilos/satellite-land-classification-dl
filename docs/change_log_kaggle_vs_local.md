@@ -49,7 +49,7 @@ This delayed stopping and increased instability after peak validation quality.
 
 ## Hygiene Actions Performed
 Active reports directory now keeps only:
-- `artifacts/reports/baseline_cnn_full.json`
+- `artifacts/reports/baseline_cnn.json`
 - `artifacts/reports/efficientnet_b0_stage1_final.json`
 - `artifacts/reports/efficientnet_b0_stage2_final.json`
 

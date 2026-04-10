@@ -40,12 +40,18 @@ The following commands are intended to work in the current scaffold.
 
 ```powershell
 c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m unittest discover -s tests
-$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --dry-run --config configs/baseline_cnn_full.json
-$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --prepare-dataset --config configs/baseline_cnn_full.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits
-$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --run-baseline --config configs/baseline_cnn_full.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/baseline_cnn_full.json --checkpoints-output checkpoints/baseline_cnn
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --dry-run --config configs/baseline_cnn.json
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --prepare-dataset --config configs/baseline_cnn.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe -m eurosat_classifier --run-baseline --config configs/baseline_cnn.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/baseline_cnn.json --checkpoints-output checkpoints/baseline_cnn
 
-$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage1.optimized.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage1_final.json --checkpoints-output checkpoints/efficientnet_b0/stage1
-$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage2.optimized.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage2_final.json --checkpoints-output checkpoints/efficientnet_b0/stage2
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage1.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage1_final.json --checkpoints-output checkpoints/efficientnet_b0/stage1
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage2.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage2_final.json --checkpoints-output checkpoints/efficientnet_b0/stage2
+```
+
+CLI now supports overriding config values at runtime (for notebooks and experiment sweeps) without creating extra config files.
+
+```powershell
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/experiment.defaults.json --model-name efficientnet_b0 --dataset-root data/EuroSAT --seed 42 --epochs 30 --batch-size 16 --learning-rate 0.0001 --augmentation-mode flips --use-pretrained --freeze-backbone --splits-output artifacts/splits --reports-output artifacts/reports/override_example.json --checkpoints-output checkpoints/override_example
 ```
 
 ## Quality Gates (Phase 7)
@@ -63,9 +69,9 @@ $env:PYTHONPATH='src'; .\.venv\Scripts\python.exe -m mypy src
 
 | Component Type | Active Files |
 | --- | --- |
-| Configs | `configs/baseline_cnn_full.json`, `configs/efficientnet_b0.stage1.optimized.json`, `configs/efficientnet_b0.stage2.optimized.json`, `configs/experiment.defaults.json` |
+| Configs | `configs/baseline_cnn.json`, `configs/efficientnet_b0.stage1.json`, `configs/efficientnet_b0.stage2.json`, `configs/experiment.defaults.json` |
 | Notebooks | `notebooks/eurosat_baseline_kaggle.ipynb`, `notebooks/eurosat_efficientnet_kaggle.ipynb` |
-| Reports | `artifacts/reports/baseline_cnn_full.json`, `artifacts/reports/efficientnet_b0_stage1_final.json`, `artifacts/reports/efficientnet_b0_stage2_final.json`, `results/final/efficientnet_b0_final_full.json` |
+| Reports | `artifacts/reports/baseline_cnn.json`, `artifacts/reports/efficientnet_b0_stage1_final.json`, `artifacts/reports/efficientnet_b0_stage2_final.json`, `results/final/efficientnet_b0_final.json` |
 
 ## Reproducibility Assets (Phase 1)
 
