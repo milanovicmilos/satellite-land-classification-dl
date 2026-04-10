@@ -32,6 +32,18 @@ class MetricsCalculatorTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             calculator.calculate([0], [0, 1], ["A", "B"])
 
+    def test_calculate_raises_for_empty_class_names(self) -> None:
+        calculator = MetricsCalculator()
+
+        with self.assertRaises(ValueError):
+            calculator.calculate([0, 1], [0, 1], [])
+
+    def test_calculate_raises_for_invalid_prediction_index(self) -> None:
+        calculator = MetricsCalculator()
+
+        with self.assertRaises(ValueError):
+            calculator.calculate([0, 1], [0, 3], ["A", "B"])
+
 
 if __name__ == "__main__":
     unittest.main()

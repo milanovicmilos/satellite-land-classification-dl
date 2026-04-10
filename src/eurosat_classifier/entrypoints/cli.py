@@ -106,13 +106,16 @@ def main() -> int:
     config_loader = _build_config_loader(args.defaults, args.seed)
 
     if args.prepare_dataset:
-        use_case = PrepareDataset(
+        prepare_dataset_use_case = PrepareDataset(
             config_loader=config_loader,
             dataset_indexer=EuroSatDatasetIndexer(),
             dataset_splitter=StratifiedSplitter(),
             split_persistence=JsonSplitPersistence(),
         )
-        payload = use_case.execute(config_path=args.config, output_dir=args.splits_output)
+        payload = prepare_dataset_use_case.execute(
+            config_path=args.config,
+            output_dir=args.splits_output,
+        )
         print(json.dumps(payload, indent=2))
         return 0
 
@@ -145,11 +148,11 @@ def main() -> int:
         return 0
 
     if args.dry_run:
-        use_case = StartTraining(
+        dry_run_use_case = StartTraining(
             config_loader,
             DryRunTrainingRunner(),
         )
-        print(use_case.execute(args.config))
+        print(dry_run_use_case.execute(args.config))
         return 0
 
     parser.print_help()

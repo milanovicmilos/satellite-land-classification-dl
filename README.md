@@ -48,6 +48,17 @@ $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classificati
 $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage2.optimized.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage2_final.json --checkpoints-output checkpoints/efficientnet_b0/stage2
 ```
 
+## Quality Gates (Phase 7)
+
+Run these commands from the repository root in an activated virtual environment.
+
+```powershell
+$env:PYTHONPATH='src'; .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+$env:PYTHONPATH='src'; .\.venv\Scripts\python.exe -m pytest -q tests
+$env:PYTHONPATH='src'; .\.venv\Scripts\python.exe -m ruff check src tests
+$env:PYTHONPATH='src'; .\.venv\Scripts\python.exe -m mypy src
+```
+
 ## Active Components
 
 | Component Type | Active Files |

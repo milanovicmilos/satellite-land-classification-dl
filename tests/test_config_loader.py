@@ -188,6 +188,57 @@ class JsonConfigLoaderTests(unittest.TestCase):
 
         self.assertIsNone(config.augmentation_mode)
 
+    def test_load_derives_scheduler_patience_from_early_stopping(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        payload = {
+            "experiment_name": "scheduler-derived",
+            "model": {"name": "baseline_cnn"},
+            "training": {
+                "early_stopping_patience": 5,
+                "scheduler_patience": None,
+            },
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertEqual(config.scheduler_patience, 2)
+
+    def test_load_defaults_empty_model_options_when_missing(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
+        )
+
+        payload = {
+            "experiment_name": "no-model-options",
+            "model": {"name": "baseline_cnn"},
+            "training": {
+                "epochs": 1,
+                "batch_size": 4,
+                "early_stopping_patience": 1,
+            },
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertEqual(config.model_options, {})
+
     def test_load_applies_constructor_seed_override(self) -> None:
         loader = JsonConfigLoader(
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json"),

@@ -590,6 +590,7 @@ class BaselineEngineComponentsTests(unittest.TestCase):
         config = JsonConfigLoader(
             defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json")
         ).load(str(PROJECT_ROOT / "configs" / "efficientnet_b0.stage1.optimized.json"))
+        config.model_options["use_pretrained"] = False
 
         tmp_dir = Path(tempfile.mkdtemp())
         try:
