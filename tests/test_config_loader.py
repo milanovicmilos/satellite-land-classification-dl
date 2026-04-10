@@ -188,6 +188,29 @@ class JsonConfigLoaderTests(unittest.TestCase):
 
         self.assertIsNone(config.augmentation_mode)
 
+    def test_load_applies_constructor_seed_override(self) -> None:
+        loader = JsonConfigLoader(
+            defaults_path=str(PROJECT_ROOT / "configs" / "experiment.defaults.json"),
+            split_seed_override=123,
+        )
+
+        payload = {
+            "experiment_name": "override-seed-test",
+            "model": {"name": "efficientnet_b0"},
+            "split": {"seed": 999},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(payload, handle)
+            config_path = handle.name
+
+        try:
+            config = loader.load(config_path)
+        finally:
+            Path(config_path).unlink(missing_ok=True)
+
+        self.assertEqual(config.split.seed, 123)
+
 
 if __name__ == "__main__":
     unittest.main()

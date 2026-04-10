@@ -11,8 +11,13 @@ from eurosat_classifier.domain.entities import DatasetSplit
 class JsonConfigLoader:
     """Loads training configuration from a JSON file."""
 
-    def __init__(self, defaults_path: str | None = None) -> None:
+    def __init__(
+        self,
+        defaults_path: str | None = None,
+        split_seed_override: int | None = None,
+    ) -> None:
         self._defaults_path = defaults_path
+        self._split_seed_override = split_seed_override
 
     @staticmethod
     def _read_json(path: str) -> dict[str, Any]:
@@ -47,6 +52,8 @@ class JsonConfigLoader:
 
         user_config = self._read_json(path)
         raw_config = self._deep_merge(config_data, user_config)
+        if self._split_seed_override is not None:
+            raw_config["split"]["seed"] = int(self._split_seed_override)
         training_config = raw_config["training"]
 
         split = DatasetSplit(

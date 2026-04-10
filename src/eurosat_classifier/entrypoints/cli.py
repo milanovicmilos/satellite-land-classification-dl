@@ -38,6 +38,12 @@ class DryRunTrainingRunner:
         return json.dumps(payload, indent=2)
 
 
+def _build_config_loader(defaults_path: str, split_seed_override: int | None) -> JsonConfigLoader:
+    """Builds config loader with optional split-seed override for reproducibility studies."""
+
+    return JsonConfigLoader(defaults_path=defaults_path, split_seed_override=split_seed_override)
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Builds the top-level CLI parser."""
 
@@ -51,6 +57,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--defaults",
         default="configs/experiment.defaults.json",
         help="Path to canonical default configuration values.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Optional split seed override to run reproducibility experiments.",
     )
     parser.add_argument(
         "--dry-run",
@@ -91,10 +103,11 @@ def main() -> int:
     configure_logging()
     parser = build_parser()
     args = parser.parse_args()
+    config_loader = _build_config_loader(args.defaults, args.seed)
 
     if args.prepare_dataset:
         use_case = PrepareDataset(
-            config_loader=JsonConfigLoader(defaults_path=args.defaults),
+            config_loader=config_loader,
             dataset_indexer=EuroSatDatasetIndexer(),
             dataset_splitter=StratifiedSplitter(),
             split_persistence=JsonSplitPersistence(),
@@ -104,7 +117,6 @@ def main() -> int:
         return 0
 
     if args.run_baseline:
-        config_loader = JsonConfigLoader(defaults_path=args.defaults)
         config = config_loader.load(args.config)
 
         split_dir = Path(args.splits_output)
@@ -134,7 +146,7 @@ def main() -> int:
 
     if args.dry_run:
         use_case = StartTraining(
-            JsonConfigLoader(defaults_path=args.defaults),
+            config_loader,
             DryRunTrainingRunner(),
         )
         print(use_case.execute(args.config))
