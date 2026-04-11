@@ -1,0 +1,2 @@
+run_id,augmentation_mode,learning_rate,epochs_requested,epochs_ran,val_f1_best,test_accuracy,test_macro_f1,report_path,checkpoint_path,selected_for_final
+baseline_flips_low_lr,flips,0.0005,50,50,0.9597807253474178,0.9619753086419753,0.9608631195224152,/kaggle/working/artifacts/reports/baseline/baseline_flips_low_lr.json,/kaggle/working/checkpoints/baseline_cnn/baseline_flips_low_lr/best_checkpoint.pt,True
