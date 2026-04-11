@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from typing import Any
 
 from eurosat_classifier.application.use_cases import PrepareDataset, StartTraining
 from eurosat_classifier.application.services.training_orchestrator import TrainingOrchestrator
@@ -38,19 +39,177 @@ class DryRunTrainingRunner:
         return json.dumps(payload, indent=2)
 
 
+def _build_config_overrides(args: argparse.Namespace) -> dict[str, Any] | None:
+    """Builds selective config overrides from CLI arguments."""
+
+    overrides: dict[str, Any] = {}
+
+    if args.experiment_name is not None:
+        overrides["experiment_name"] = args.experiment_name
+    if args.dataset_root is not None:
+        overrides["dataset_root"] = args.dataset_root
+
+    split_overrides: dict[str, Any] = {}
+    if args.train_ratio is not None:
+        split_overrides["train_ratio"] = args.train_ratio
+    if args.validation_ratio is not None:
+        split_overrides["validation_ratio"] = args.validation_ratio
+    if args.test_ratio is not None:
+        split_overrides["test_ratio"] = args.test_ratio
+    if args.stratified is not None:
+        split_overrides["stratified"] = args.stratified
+    if split_overrides:
+        overrides["split"] = split_overrides
+
+    training_overrides: dict[str, Any] = {}
+    if args.epochs is not None:
+        training_overrides["epochs"] = args.epochs
+    if args.batch_size is not None:
+        training_overrides["batch_size"] = args.batch_size
+    if args.early_stopping_patience is not None:
+        training_overrides["early_stopping_patience"] = args.early_stopping_patience
+    if args.early_stopping_min_delta is not None:
+        training_overrides["early_stopping_min_delta"] = args.early_stopping_min_delta
+    if args.learning_rate is not None:
+        training_overrides["learning_rate"] = args.learning_rate
+    if args.scheduler_factor is not None:
+        training_overrides["scheduler_factor"] = args.scheduler_factor
+    if args.scheduler_patience is not None:
+        training_overrides["scheduler_patience"] = args.scheduler_patience
+    if args.min_learning_rate is not None:
+        training_overrides["min_learning_rate"] = args.min_learning_rate
+    if args.augmentation_mode is not None:
+        training_overrides["augmentation_mode"] = args.augmentation_mode
+    if args.resume_from is not None:
+        training_overrides["resume_from"] = args.resume_from
+    if training_overrides:
+        overrides["training"] = training_overrides
+
+    model_overrides: dict[str, Any] = {}
+    if args.model_name is not None:
+        model_overrides["name"] = args.model_name
+
+    model_options: dict[str, Any] = {}
+    if args.use_pretrained is not None:
+        model_options["use_pretrained"] = args.use_pretrained
+    if args.freeze_backbone is not None:
+        model_options["freeze_backbone"] = args.freeze_backbone
+    if model_options:
+        model_overrides["options"] = model_options
+
+    if model_overrides:
+        overrides["model"] = model_overrides
+
+    return overrides or None
+
+
+def _build_config_loader(
+    defaults_path: str,
+    split_seed_override: int | None,
+    config_overrides: dict[str, Any] | None,
+) -> JsonConfigLoader:
+    """Builds config loader with optional split-seed override for reproducibility studies."""
+
+    return JsonConfigLoader(
+        defaults_path=defaults_path,
+        split_seed_override=split_seed_override,
+        config_overrides=config_overrides,
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Builds the top-level CLI parser."""
 
     parser = argparse.ArgumentParser(description="EuroSAT project scaffold CLI")
     parser.add_argument(
         "--config",
-        default="configs/baseline_cnn_full.json",
+        default="configs/baseline_cnn.json",
         help="Path to an experiment configuration file.",
     )
     parser.add_argument(
         "--defaults",
         default="configs/experiment.defaults.json",
         help="Path to canonical default configuration values.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Optional split seed override to run reproducibility experiments.",
+    )
+    parser.add_argument("--experiment-name", default=None, help="Optional experiment_name override.")
+    parser.add_argument("--dataset-root", default=None, help="Optional dataset_root override.")
+    parser.add_argument("--model-name", default=None, help="Optional model.name override.")
+    parser.add_argument("--train-ratio", type=float, default=None, help="Optional split.train_ratio override.")
+    parser.add_argument(
+        "--validation-ratio",
+        type=float,
+        default=None,
+        help="Optional split.validation_ratio override.",
+    )
+    parser.add_argument("--test-ratio", type=float, default=None, help="Optional split.test_ratio override.")
+    parser.add_argument(
+        "--stratified",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Optional split.stratified override.",
+    )
+    parser.add_argument("--epochs", type=int, default=None, help="Optional training.epochs override.")
+    parser.add_argument("--batch-size", type=int, default=None, help="Optional training.batch_size override.")
+    parser.add_argument(
+        "--early-stopping-patience",
+        type=int,
+        default=None,
+        help="Optional training.early_stopping_patience override.",
+    )
+    parser.add_argument(
+        "--early-stopping-min-delta",
+        type=float,
+        default=None,
+        help="Optional training.early_stopping_min_delta override.",
+    )
+    parser.add_argument(
+        "--learning-rate",
+        type=float,
+        default=None,
+        help="Optional training.learning_rate override.",
+    )
+    parser.add_argument(
+        "--scheduler-factor",
+        type=float,
+        default=None,
+        help="Optional training.scheduler_factor override.",
+    )
+    parser.add_argument(
+        "--scheduler-patience",
+        type=int,
+        default=None,
+        help="Optional training.scheduler_patience override.",
+    )
+    parser.add_argument(
+        "--min-learning-rate",
+        type=float,
+        default=None,
+        help="Optional training.min_learning_rate override.",
+    )
+    parser.add_argument(
+        "--augmentation-mode",
+        choices=["none", "flips", "full"],
+        default=None,
+        help="Optional training.augmentation_mode override.",
+    )
+    parser.add_argument("--resume-from", default=None, help="Optional training.resume_from override.")
+    parser.add_argument(
+        "--use-pretrained",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Optional model.options.use_pretrained override.",
+    )
+    parser.add_argument(
+        "--freeze-backbone",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Optional model.options.freeze_backbone override.",
     )
     parser.add_argument(
         "--dry-run",
@@ -91,10 +250,12 @@ def main() -> int:
     configure_logging()
     parser = build_parser()
     args = parser.parse_args()
+    config_overrides = _build_config_overrides(args)
+    config_loader = _build_config_loader(args.defaults, args.seed, config_overrides)
 
     if args.prepare_dataset:
         prepare_dataset_use_case = PrepareDataset(
-            config_loader=JsonConfigLoader(defaults_path=args.defaults),
+            config_loader=config_loader,
             dataset_indexer=EuroSatDatasetIndexer(),
             dataset_splitter=StratifiedSplitter(),
             split_persistence=JsonSplitPersistence(),
@@ -107,7 +268,6 @@ def main() -> int:
         return 0
 
     if args.run_baseline:
-        config_loader = JsonConfigLoader(defaults_path=args.defaults)
         config = config_loader.load(args.config)
 
         split_dir = Path(args.splits_output)
@@ -137,7 +297,7 @@ def main() -> int:
 
     if args.dry_run:
         dry_run_use_case = StartTraining(
-            JsonConfigLoader(defaults_path=args.defaults),
+            config_loader,
             DryRunTrainingRunner(),
         )
         print(dry_run_use_case.execute(args.config))

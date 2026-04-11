@@ -52,6 +52,10 @@ class JsonReportWriterTests(unittest.TestCase):
             content = Path(result).read_text(encoding="utf-8")
             self.assertIn('"accuracy": 0.9', content)
             self.assertIn('"model_name": "baseline_cnn"', content)
+            self.assertIn('"precision": {', content)
+            self.assertIn('"recall": {', content)
+            self.assertIn('"A": 0.9', content)
+            self.assertIn('"A": 0.8', content)
 
             epoch_log_path = output_path.with_suffix(".training_log.tmp.json")
             self.assertTrue(epoch_log_path.exists())

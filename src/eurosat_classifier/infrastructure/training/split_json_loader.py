@@ -40,17 +40,20 @@ class SplitJsonDataset(Dataset):
             )
         ]
 
-        if self._augmentation_mode in {"flips", "full"}:
+        if self._augmentation_mode == "flips":
             transforms.extend(
                 [
                     T.RandomHorizontalFlip(p=0.5),
                     T.RandomVerticalFlip(p=0.5),
+                    self._build_right_angle_rotation(),
                 ]
             )
 
         if self._augmentation_mode == "full":
             transforms.extend(
                 [
+                    T.RandomHorizontalFlip(p=0.5),
+                    T.RandomVerticalFlip(p=0.5),
                     T.RandomRotation(
                         degrees=20,
                         interpolation=InterpolationMode.BILINEAR,
@@ -71,6 +74,35 @@ class SplitJsonDataset(Dataset):
             transforms.append(T.Normalize(mean=self._normalize_mean, std=self._normalize_std))
 
         return T.Compose(transforms)
+
+    @staticmethod
+    def _build_right_angle_rotation() -> T.RandomChoice:
+        """Builds random right-angle rotations for orientation-invariant satellite views."""
+
+        return T.RandomChoice(
+            [
+                T.RandomRotation(
+                    degrees=(0, 0),
+                    interpolation=InterpolationMode.BILINEAR,
+                    fill=(255, 255, 255),
+                ),
+                T.RandomRotation(
+                    degrees=(90, 90),
+                    interpolation=InterpolationMode.BILINEAR,
+                    fill=(255, 255, 255),
+                ),
+                T.RandomRotation(
+                    degrees=(180, 180),
+                    interpolation=InterpolationMode.BILINEAR,
+                    fill=(255, 255, 255),
+                ),
+                T.RandomRotation(
+                    degrees=(270, 270),
+                    interpolation=InterpolationMode.BILINEAR,
+                    fill=(255, 255, 255),
+                ),
+            ]
+        )
 
     def __len__(self) -> int:
         return len(self._samples)

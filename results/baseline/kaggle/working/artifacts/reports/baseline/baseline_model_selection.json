@@ -1,0 +1,12 @@
+{
+  "selection_rule": "Select max(val_f1_best) on validation split; keep test metrics for holdout reporting only.",
+  "selection_metric": "val_f1_best",
+  "selected_run_id": "baseline_flips_low_lr",
+  "selected_val_f1_best": 0.9597807253474178,
+  "split_seed": 42,
+  "runs_in_selection_pool": [
+    "baseline_flips_low_lr",
+    "baseline_flips",
+    "baseline_reference_none"
+  ]
+}

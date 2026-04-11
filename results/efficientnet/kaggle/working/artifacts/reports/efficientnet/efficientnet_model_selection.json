@@ -1,0 +1,13 @@
+{
+  "selection_rule": "Select max(val_f1_best) within stage2 runs; keep test metrics for holdout reporting only.",
+  "selection_metric": "val_f1_best",
+  "selection_pool": "stage2",
+  "selected_run_id": "efficientnet_stage2_reference",
+  "selected_val_f1_best": 0.9788754655532695,
+  "split_seed": 42,
+  "runs_in_selection_pool": [
+    "efficientnet_stage2_reference",
+    "efficientnet_stage2_low_lr",
+    "efficientnet_stage2_no_aug"
+  ]
+}

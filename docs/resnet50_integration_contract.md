@@ -62,8 +62,8 @@ Training options (shared contract):
 
 ## Runtime Assets
 
-- Stage 1 config: `configs/resnet50.stage1.optimized.json`.
-- Stage 2 config: `configs/resnet50.stage2.optimized.json`.
+- Stage 1 config: `configs/resnet50.stage1.json`.
+- Stage 2 config: `configs/resnet50.stage2.json`.
 - Reusable template: `configs/resnet50.template.json`.
 
 ## Checkpoint Compatibility Rule
@@ -76,6 +76,6 @@ Training options (shared contract):
 The following are example commands for local runs:
 
 ```powershell
-$env:PYTHONPATH='src'; python run.py --run-baseline --config configs/resnet50.stage1.optimized.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/resnet50_stage1_final.json --checkpoints-output checkpoints/resnet50/stage1
-$env:PYTHONPATH='src'; python run.py --run-baseline --config configs/resnet50.stage2.optimized.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/resnet50_stage2_final.json --checkpoints-output checkpoints/resnet50/stage2
+$env:PYTHONPATH='src'; python run.py --run-baseline --config configs/resnet50.stage1.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/resnet50_stage1_final.json --checkpoints-output checkpoints/resnet50/stage1
+$env:PYTHONPATH='src'; python run.py --run-baseline --config configs/resnet50.stage2.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/resnet50_stage2_final.json --checkpoints-output checkpoints/resnet50/stage2
 ```
