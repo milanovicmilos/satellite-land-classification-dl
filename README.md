@@ -2,6 +2,12 @@
 
 Python project for EuroSAT land-use classification with a baseline CNN, EfficientNetB0 fine-tuning, and ResNet50 fine-tuning.
 
+## Project Status
+
+- Core implementation is complete for all three model families: baseline CNN, EfficientNetB0, and ResNet50.
+- Reproducibility pipeline is in place (deterministic stratified split artifacts with fixed seed).
+- Kaggle experiment snapshots and thesis-oriented reports are present in the repository.
+
 ## Project Scope
 
 - Dataset: EuroSAT RGB dataset.
@@ -11,8 +17,10 @@ Python project for EuroSAT land-use classification with a baseline CNN, Efficien
 
 ## Methodology
 
-- Baseline full run uses `early_stopping_patience=10` as anti-overfitting protection.
-- This allows convergence while preserving scientific validity by stopping when Validation Macro F1-score stops improving.
+- Selection policy: choose final runs by validation macro F1 (`val_f1_best`), then report holdout test metrics.
+- Baseline: single-stage training from scratch.
+- EfficientNetB0 and ResNet50: two-stage transfer protocol (stage1 frozen backbone, stage2 unfrozen fine-tuning).
+- Determinism policy: fixed split seed and persisted split artifacts shared across model families.
 
 ## Team Ownership
 
@@ -34,6 +42,21 @@ configs/           Example experiment configurations
 data/              Local dataset storage, ignored by Git
 ```
 
+## Setup
+
+Create and activate a Python 3.12 virtual environment, then install project dependencies.
+
+```powershell
+python -m pip install --upgrade pip
+pip install -e .
+```
+
+Install development tooling (tests, lint, type checks):
+
+```powershell
+pip install -e ".[dev]"
+```
+
 ## Verified Local Commands
 
 The following commands are intended to work in the current scaffold.
@@ -46,6 +69,9 @@ $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classificati
 
 $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage1.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage1_final.json --checkpoints-output checkpoints/efficientnet_b0/stage1
 $env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/efficientnet_b0.stage2.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/efficientnet_b0_stage2_final.json --checkpoints-output checkpoints/efficientnet_b0/stage2
+
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/resnet50.stage1.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/resnet50_stage1_final.json --checkpoints-output checkpoints/resnet50/stage1
+$env:PYTHONPATH='src'; c:/Users/Milos/PythonProjects/satellite-land-classification-dl/.venv/Scripts/python.exe run.py --run-baseline --config configs/resnet50.stage2.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/resnet50_stage2_final.json --checkpoints-output checkpoints/resnet50/stage2
 ```
 
 CLI now supports overriding config values at runtime (for notebooks and experiment sweeps) without creating extra config files.
@@ -69,9 +95,10 @@ $env:PYTHONPATH='src'; .\.venv\Scripts\python.exe -m mypy src
 
 | Component Type | Active Files |
 | --- | --- |
-| Configs | `configs/baseline_cnn.json`, `configs/efficientnet_b0.stage1.json`, `configs/efficientnet_b0.stage2.json`, `configs/experiment.defaults.json` |
-| Notebooks | `notebooks/eurosat_baseline_kaggle.ipynb`, `notebooks/eurosat_efficientnet_kaggle.ipynb` |
-| Reports | `artifacts/reports/baseline_cnn.json`, `artifacts/reports/efficientnet_b0_stage1_final.json`, `artifacts/reports/efficientnet_b0_stage2_final.json`, `results/final/efficientnet_b0_final.json` |
+| Configs | `configs/baseline_cnn.json`, `configs/efficientnet_b0.stage1.json`, `configs/efficientnet_b0.stage2.json`, `configs/resnet50.stage1.json`, `configs/resnet50.stage2.json`, `configs/resnet50.template.json`, `configs/experiment.defaults.json` |
+| Notebooks | `notebooks/eurosat_baseline_kaggle.ipynb`, `notebooks/eurosat_efficientnet_kaggle.ipynb`, `notebooks/eurosat_resnet50_kaggle.ipynb` |
+| Result Snapshots | `results/eurosat-baseline.ipynb`, `results/eurosat-efficientnet.ipynb`, `results/eurosat-resnet.ipynb` |
+| Experiment Logs | `docs/experiments_log.md`, `docs/report.md`, `docs/evaluation_protocol.md` |
 
 ## Reproducibility Assets (Phase 1)
 
@@ -83,6 +110,18 @@ $env:PYTHONPATH='src'; .\.venv\Scripts\python.exe -m mypy src
   - `artifacts/splits/validation_split.json`
   - `artifacts/splits/test_split.json`
   - `artifacts/splits/split_summary.json`
+
+## Current Result Summary
+
+Selected final runs from current documentation snapshots:
+- Baseline CNN: `baseline_flips_low_lr`
+- EfficientNetB0: `efficientnet_stage2_reference`
+- ResNet50: `resnet50_stage2_reference`
+
+Current ranking by holdout test metrics in `docs/experiments_log.md`:
+- Best overall: ResNet50
+- Second: EfficientNetB0
+- Reference: Baseline CNN
 
 ## Notes
 

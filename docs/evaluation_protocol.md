@@ -47,21 +47,31 @@ Required columns:
 
 ## Acceptance Criteria
 
+All three model families follow identical evaluation setup and acceptance rules:
+
 ### Baseline CNN
 
 - End-to-end train/validation/test execution completes.
 - Required metrics are produced for test split.
 - Confusion matrix artifact is exported.
 - Output row follows `eurosat-model-comparison-v1` schema.
+- Selection by validation macro F1 across all baseline runs.
 
 ### EfficientNetB0 (Milos Scope)
 
 - Stage 1 (frozen backbone) execution completes.
 - Stage 2 (fine-tuning/unfreeze) execution completes.
 - Required metrics are produced for test split.
-- Comparison against baseline CNN is generated in a summary report.
+- Selection by validation macro F1 within Stage 2 pool only.
+- Stage 1 serves as a transfer baseline, not a final comparator.
+- Comparison against baseline CNN and ResNet50 is provided in summary reports.
 
 ### ResNet50 (Bojan Scope)
 
-- Integration must follow the same split, protocol, and table schema.
+- Stage 1 (frozen backbone) execution completes.
+- Stage 2 (fine-tuning/unfreeze) execution completes.
+- Required metrics are produced for test split.
+- Selection by validation macro F1 within Stage 2 pool only.
+- Stage 1 serves as a transfer baseline, not a final comparator.
+- Integration follows the same split, protocol, and table schema as baseline and EfficientNet.
 - Ownership boundary is preserved according to project instructions.
