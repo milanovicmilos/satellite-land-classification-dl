@@ -1,39 +1,46 @@
 # EuroSAT Land-Use Classification
 
-Python project for 10-class land-use classification on EuroSAT RGB images.
+Deep learning project for EuroSAT RGB land-use classification (10 classes), with three model families:
 
-This repository is organized to fully satisfy the required project deliverables:
+- baseline CNN (from scratch)
+- EfficientNetB0 fine-tuning
+- ResNet50 fine-tuning
 
-1. Source code
-2. Documentation with setup and run instructions
-3. Final paper in PDF format
+The project emphasizes reproducibility (fixed seed + deterministic stratified split), consistent evaluation across all model families, and clean architecture.
 
-## 1. Source Code
+## Overview
 
-Core implementation is in:
+- Dataset: EuroSAT RGB
+- Task: multi-class image classification (10 labels)
+- Split policy: stratified `70/15/15` (train/validation/test)
+- Evaluation metrics: accuracy, macro F1-score, confusion matrix, per-class precision, per-class recall
 
-- `src/eurosat_classifier/`
-- `tests/`
-- `configs/`
-- `run.py`
-- `pyproject.toml`
+This repository includes both local CLI execution and Kaggle-oriented experiment flows.
 
-Main architecture follows layered boundaries:
+## Repository Structure
 
-- `domain`: entities and metrics contracts
-- `application`: use cases and orchestration services
-- `infrastructure`: dataset loading, model wiring, evaluation, checkpointing
-- `entrypoints`: command-line interface
+```text
+src/eurosat_classifier/
+	domain/          Entities and metric contracts
+	application/     Use cases and orchestration
+	infrastructure/  Data access, models, training, evaluation, checkpointing
+	entrypoints/     CLI entrypoint
+tests/             Unit and smoke tests
+configs/           Experiment configurations
+notebooks/         Training notebooks (Kaggle-oriented)
+results/           Exported experiment outputs and snapshots
+docs/              Final report and project documents
+```
 
-## 2. Documentation And How To Run
+## Quick Start
 
 ### Prerequisites
 
-- Python 3.12
-- pip
-- EuroSAT RGB dataset available locally under `data/EuroSAT/`
+- Python `3.12`
+- `pip`
+- EuroSAT RGB dataset available locally at `data/EuroSAT/`
 
-Dataset notes are in `data/README.md`.
+See dataset notes in `data/README.md`.
 
 ### Installation
 
@@ -44,35 +51,60 @@ python -m pip install --upgrade pip
 pip install -e .
 ```
 
-Optional development tools:
+Install development dependencies (tests, lint, type checks):
 
 ```powershell
 pip install -e ".[dev]"
 ```
 
-### Basic CLI Usage
+## Run The Pipeline
 
-Use commands from repository root.
+Run commands from repository root.
 
-Dry run:
+Validate config and wiring:
 
 ```powershell
 $env:PYTHONPATH='src'; python -m eurosat_classifier --dry-run --config configs/baseline_cnn.json
 ```
 
-Prepare deterministic dataset split artifacts:
+Generate deterministic split artifacts:
 
 ```powershell
 $env:PYTHONPATH='src'; python -m eurosat_classifier --prepare-dataset --config configs/baseline_cnn.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits
 ```
 
-Run baseline training and evaluation:
+Train and evaluate baseline CNN:
 
 ```powershell
 $env:PYTHONPATH='src'; python -m eurosat_classifier --run-baseline --config configs/baseline_cnn.json --defaults configs/experiment.defaults.json --splits-output artifacts/splits --reports-output artifacts/reports/baseline_metrics.json --checkpoints-output checkpoints/baseline
 ```
 
-Run quality checks:
+## Kaggle Workflow
+
+Kaggle is a first-class execution target in this project.
+
+Primary Kaggle runner notebooks:
+
+- `notebooks/eurosat_baseline_kaggle.ipynb`
+- `notebooks/eurosat_efficientnet_kaggle.ipynb`
+- `notebooks/eurosat_resnet50_kaggle.ipynb`
+
+Result snapshot notebooks:
+
+- `results/eurosat-baseline.ipynb`
+- `results/eurosat-efficientnet.ipynb`
+- `results/eurosat-resnet.ipynb`
+
+Typical Kaggle runtime layout used by the notebooks:
+
+- Dataset input: `/kaggle/input/.../EuroSAT`
+- Generated splits: `/kaggle/working/artifacts/splits`
+- Reports: `/kaggle/working/artifacts/reports/...`
+- Checkpoints: `/kaggle/working/checkpoints/...`
+
+The notebooks package outputs into zip files in `/kaggle/working` so they can be downloaded and archived.
+
+## Quality Checks
 
 ```powershell
 $env:PYTHONPATH='src'; python -m pytest -q tests
@@ -80,7 +112,7 @@ $env:PYTHONPATH='src'; python -m ruff check src tests
 $env:PYTHONPATH='src'; python -m mypy src
 ```
 
-### Useful Project Files
+## Configurations
 
 - `configs/experiment.defaults.json`
 - `configs/baseline_cnn.json`
@@ -88,16 +120,17 @@ $env:PYTHONPATH='src'; python -m mypy src
 - `configs/efficientnet_b0.stage2.json`
 - `configs/resnet50.stage1.json`
 - `configs/resnet50.stage2.json`
-- `results/` (experiment outputs and snapshots)
-- `notebooks/` (Kaggle-oriented notebooks)
+- `configs/resnet50.template.json`
 
-## 3. Final PDF Version Of The Paper
+## Project Paper
 
-Final paper is included at:
-
-- `docs/EuroSAT_klasifikacija_Milanovic_Zivanic.pdf`
+- Final PDF: `docs/EuroSAT_klasifikacija_Milanovic_Zivanic.pdf`
+- Working document: `docs/EuroSAT_klasifikacija_Milanovic_Zivanic.docx`
+- Original specification: `docs/specifikacija.txt`
 
 ## Team
 
-- Miloš Milanović: EfficientNetB0 and shared infrastructure
+This project was developed collaboratively by both team members.
+
+- Miloš Milanović: EfficientNetB0
 - Bojan Živanić: ResNet50
