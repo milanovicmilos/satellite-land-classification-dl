@@ -1,0 +1,57 @@
+﻿Klasifikacija namene zemlji┼íta na satelitskim snimcima primenom dubokih neuronskih mre┼╛a (EuroSAT)
+Tim
+Milo┼í Milanovi─ç ΓÇô R2 5/2025
+Bojan ┼╜ivani─ç ΓÇô R2 22/2025
+Definicija problema
+Problem koji se re┼íava je automatska klasifikacija namene i pokrivenosti zemlji┼íta na osnovu satelitskih snimaka. Ta─ìna i brza klasifikacija satelitskih snimaka ima ┼íiroku prakti─ìnu primenu u urbanom planiranju, pra─çenju uni┼ítenja ┼íuma, preciznoj poljoprivredi i pra─çenju klimatskih promena.
+
+Zadatak je vi┼íeklasna klasifikacija - svakom ulaznom satelitskom snimku potrebno je dodeliti jednu od 10 kategorija namene zemlji┼íta.
+
+Skup podataka
+Izvor: EuroSAT Dataset (Kaggle)
+Originalni rad: Helber et al., "EuroSAT: A Novel Dataset and Deep Learning Benchmark for Land Use and Land Cover Classification", IEEE JSTARS, 2019.
+
+Veli─ìina i struktura:
+
+Ukupno 27.000 georeferenciranih satelitskih snimaka rezolucije 64├ù64 piksela
+Snimci poti─ìu sa Sentinel-2 satelita (Evropska svemirska agencija)
+RGB verzija - 3 kanala (standardne boje vidljivog spektra), JPEG format
+10 uravnote┼╛enih klasa (~2.700 slika po klasi):
+Klasa	Opis
+AnnualCrop	Godi┼ínji usevi
+Forest	┼áuma
+HerbaceousVegetation	Zeljasta vegetacija
+Highway	Autoput
+Industrial	Industrijska zona
+Pasture	Pa┼ínjak
+PermanentCrop	Vi┼íegodi┼ínji usevi
+Residential	Stambena zona
+River	Reka
+SeaLake	More / jezero
+Anotacija: Dataset je ve─ç u potpunosti anotiran - labele su kodirane u folder strukturi, nije potrebna dodatna anotacija.
+
+Metodologija
+Baseline model
+Implementira─çemo jednostavnu konvolucionu neuronsku mre┼╛u (CNN) treniranu od nule kao referentnu ta─ìku za pore─æenje sa naprednijim re┼íenjima.
+
+Modeli
+EfficientNetB0 Fine Tuning
+
+EfficientNetB0 je odabran zbog izuzetnog odnosa ta─ìnosti i ra─ìunske efikasnosti, ┼íto ga ─ìini idealnim za datasete srednje veli─ìine poput EuroSAT-a.
+
+ResNet50 Fine Tuning
+
+ResNet50 je odabran kao komplementarna arhitektura EfficientNetu - dublja mre┼╛a sa rezidualnim vezama koja druga─ìije ekstrahuje prostorne karakteristike, ┼íto omogu─çava smisleno pore─æenje izme─æu dva pristupa.
+
+Evaluacija
+Po┼íto je dataset uravnote┼╛en (~2.700 slika po klasi), bi─çe podeljen stratifikovano po klasama na trening (70%), validacioni (15%) i test skup (15%), kako bi se o─ìuvao balans izme─æu svih 10 klasa. Podela se vr┼íi uz definisani seed kako bi rezultati bili reproduktibilni.
+
+Sva tri modela (baseline CNN, EfficientNetB0 i ResNet50) treniraju se na trening skupu, dok se validacioni skup koristi za pra─çenje performansi tokom treninga i rano zaustavljanje treninga (early stopping) u cilju spre─ìavanja pretreniranosti.
+
+Kona─ìna evaluacija vr┼íi se nad istim test skupom za sva tri modela, ─ìime se obezbe─æuje objektivno i fer pore─æenje. Nad test skupom se ra─ìunaju slede─çe metrike:
+
+Accuracy - primarna metrika
+Macro F1-score - ravnomerno vrednovanje svih klasa
+Confusion Matrix - vizualizacija gre┼íaka po klasama
+Per-class Precision i Recall - identifikacija klasa koje su modelima najte┼╛e
+Rezultati sva tri modela bi─çe prikazani u sumarnoj tabeli i me─æusobno pore─æeni kako bi se analizirale razlike u performansama izme─æu baseline modela i modela zasnovanih na fine-tuning pristupu.

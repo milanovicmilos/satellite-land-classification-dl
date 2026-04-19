@@ -1,0 +1,30 @@
+{
+  "experiment_name": "resnet50-stage2",
+  "dataset_root": "data/EuroSAT",
+  "split": {
+    "train_ratio": 0.7,
+    "validation_ratio": 0.15,
+    "test_ratio": 0.15,
+    "seed": 42,
+    "stratified": true
+  },
+  "training": {
+    "epochs": 30,
+    "batch_size": 16,
+    "early_stopping_patience": 3,
+    "early_stopping_min_delta": 0.001,
+    "learning_rate": 0.0001,
+    "scheduler_factor": 0.5,
+    "scheduler_patience": 1,
+    "min_learning_rate": 0.0000001,
+    "augmentation_mode": "flips",
+    "resume_from": "checkpoints/resnet50/stage1/best_checkpoint.pt"
+  },
+  "model": {
+    "name": "resnet50",
+    "options": {
+      "use_pretrained": false,
+      "freeze_backbone": false
+    }
+  }
+}

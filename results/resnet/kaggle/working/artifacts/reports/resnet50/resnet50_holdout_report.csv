@@ -1,0 +1,2 @@
+run_id,stage,augmentation_mode,learning_rate,freeze_backbone,epochs_requested,epochs_ran,val_f1_best,test_accuracy,test_macro_f1,report_path,checkpoint_path,selected_for_final
+resnet50_stage2_reference,stage2,flips,0.0001,False,30,9,0.9784886187232578,0.9787654320987654,0.9784682223501147,/kaggle/working/artifacts/reports/resnet50/resnet50_stage2_reference.json,/kaggle/working/checkpoints/resnet50/resnet50_stage2_reference/best_checkpoint.pt,True

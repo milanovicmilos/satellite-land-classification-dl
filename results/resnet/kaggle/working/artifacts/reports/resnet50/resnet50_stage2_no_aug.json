@@ -1,0 +1,238 @@
+{
+  "metadata": {
+    "model_name": "resnet50",
+    "dataset_root": "/kaggle/input/datasets/apollo2506/eurosat-dataset/EuroSAT",
+    "split_seed": 42,
+    "checkpoint_path": "/kaggle/working/checkpoints/resnet50/resnet50_stage2_no_aug/best_checkpoint.pt",
+    "hyperparameters": {
+      "epochs": 30,
+      "batch_size": 16,
+      "early_stopping_patience": 3,
+      "learning_rate": 0.0001,
+      "scheduler_factor": 0.5,
+      "scheduler_patience": 1,
+      "min_learning_rate": 1e-07,
+      "early_stopping_min_delta": 0.001,
+      "augmentation_mode": "none"
+    },
+    "training_state": {
+      "epochs_requested": 30,
+      "epochs_ran": 5,
+      "best_validation_loss": 0.10404783709483005,
+      "best_validation_f1": 0.9671767653687162,
+      "best_epoch": 2,
+      "early_stopping_patience": 3,
+      "early_stopping_min_delta": 0.001,
+      "learning_rate": 0.0001,
+      "scheduler_factor": 0.5,
+      "scheduler_patience": 1,
+      "min_learning_rate": 1e-07,
+      "batch_size": 16,
+      "class_weights": [
+        0.8999999761581421,
+        0.8999999761581421,
+        0.8999999761581421,
+        1.0800000429153442,
+        1.0800000429153442,
+        1.350000023841858,
+        1.0800000429153442,
+        0.8999999761581421,
+        1.0800000429153442,
+        0.8999999761581421
+      ],
+      "epoch_logs": [
+        {
+          "epoch": 1,
+          "train_loss": 0.32386764959576375,
+          "val_loss": 0.16397628716201618,
+          "val_acc": 0.9469135802469136,
+          "val_f1": 0.9474268826157589,
+          "lr": 0.0001
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.13313399052829283,
+          "val_loss": 0.10404783709483005,
+          "val_acc": 0.9681481481481482,
+          "val_f1": 0.9671767653687162,
+          "lr": 0.0001
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.07951438407362052,
+          "val_loss": 0.39303498423124245,
+          "val_acc": 0.9360493827160494,
+          "val_f1": 0.9381131081618165,
+          "lr": 0.0001
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.0639689146539237,
+          "val_loss": 0.32150813717914467,
+          "val_acc": 0.948641975308642,
+          "val_f1": 0.9497398943670021,
+          "lr": 5e-05
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.03341482829626779,
+          "val_loss": 0.15975801910429605,
+          "val_acc": 0.9649382716049383,
+          "val_f1": 0.9655307468243535,
+          "lr": 5e-05
+        }
+      ]
+    }
+  },
+  "epoch_log_path": "/kaggle/working/artifacts/reports/resnet50/resnet50_stage2_no_aug.training_log.tmp.json",
+  "metrics": {
+    "accuracy": 0.9646913580246913,
+    "macro_f1_score": 0.9635678984014433,
+    "precision": {
+      "AnnualCrop": 0.95,
+      "Forest": 0.9954441913439636,
+      "HerbaceousVegetation": 0.9474835886214442,
+      "Highway": 0.9851632047477745,
+      "Industrial": 0.9612403100775194,
+      "Pasture": 0.9512987012987013,
+      "PermanentCrop": 0.943089430894309,
+      "Residential": 0.9954853273137697,
+      "River": 0.9226932668329177,
+      "SeaLake": 0.9888641425389755
+    },
+    "recall": {
+      "AnnualCrop": 0.9711111111111111,
+      "Forest": 0.9711111111111111,
+      "HerbaceousVegetation": 0.9622222222222222,
+      "Highway": 0.8853333333333333,
+      "Industrial": 0.992,
+      "Pasture": 0.9766666666666667,
+      "PermanentCrop": 0.928,
+      "Residential": 0.98,
+      "River": 0.9866666666666667,
+      "SeaLake": 0.9866666666666667
+    },
+    "confusion_matrix": [
+      [
+        437,
+        0,
+        1,
+        1,
+        0,
+        5,
+        3,
+        0,
+        2,
+        1
+      ],
+      [
+        0,
+        437,
+        7,
+        0,
+        0,
+        4,
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        2,
+        433,
+        1,
+        0,
+        1,
+        12,
+        0,
+        0,
+        0
+      ],
+      [
+        8,
+        0,
+        3,
+        332,
+        5,
+        0,
+        4,
+        0,
+        22,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        372,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        3,
+        0,
+        0,
+        293,
+        0,
+        0,
+        1,
+        2
+      ],
+      [
+        10,
+        0,
+        10,
+        0,
+        0,
+        5,
+        348,
+        0,
+        2,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        8,
+        0,
+        1,
+        441,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        2,
+        2,
+        0,
+        0,
+        0,
+        370,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4,
+        444
+      ]
+    ]
+  }
+}

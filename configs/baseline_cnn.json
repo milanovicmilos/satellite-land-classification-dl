@@ -1,5 +1,5 @@
 {
-  "experiment_name": "baseline-cnn-example",
+  "experiment_name": "baseline-cnn",
   "dataset_root": "data/EuroSAT",
   "split": {
     "train_ratio": 0.7,
@@ -9,9 +9,11 @@
     "stratified": true
   },
   "training": {
-    "epochs": 25,
-    "batch_size": 32,
-    "early_stopping_patience": 5
+    "epochs": 50,
+    "batch_size": 16,
+    "early_stopping_patience": 10,
+    "learning_rate": 0.0005,
+    "augmentation_mode": "flips"
   },
   "model": {
     "name": "baseline_cnn"

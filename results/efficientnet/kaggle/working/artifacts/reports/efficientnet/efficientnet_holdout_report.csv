@@ -1,0 +1,2 @@
+run_id,stage,augmentation_mode,learning_rate,freeze_backbone,epochs_requested,epochs_ran,val_f1_best,test_accuracy,test_macro_f1,report_path,checkpoint_path,selected_for_final
+efficientnet_stage2_reference,stage2,flips,0.0001,False,30,24,0.9788754655532695,0.974320987654321,0.9736213116754511,/kaggle/working/artifacts/reports/efficientnet/efficientnet_stage2_reference.json,/kaggle/working/checkpoints/efficientnet_b0/efficientnet_stage2_reference/best_checkpoint.pt,True
