@@ -1,0 +1,270 @@
+{
+  "metadata": {
+    "model_name": "resnet50",
+    "dataset_root": "/kaggle/input/datasets/apollo2506/eurosat-dataset/EuroSAT",
+    "split_seed": 42,
+    "checkpoint_path": "/kaggle/working/checkpoints/resnet50/resnet50_stage2_reference/best_checkpoint.pt",
+    "hyperparameters": {
+      "epochs": 30,
+      "batch_size": 16,
+      "early_stopping_patience": 3,
+      "learning_rate": 0.0001,
+      "scheduler_factor": 0.5,
+      "scheduler_patience": 1,
+      "min_learning_rate": 1e-07,
+      "early_stopping_min_delta": 0.001,
+      "augmentation_mode": "flips"
+    },
+    "training_state": {
+      "epochs_requested": 30,
+      "epochs_ran": 9,
+      "best_validation_loss": 0.06285718094971623,
+      "best_validation_f1": 0.9784886187232578,
+      "best_epoch": 6,
+      "early_stopping_patience": 3,
+      "early_stopping_min_delta": 0.001,
+      "learning_rate": 0.0001,
+      "scheduler_factor": 0.5,
+      "scheduler_patience": 1,
+      "min_learning_rate": 1e-07,
+      "batch_size": 16,
+      "class_weights": [
+        0.8999999761581421,
+        0.8999999761581421,
+        0.8999999761581421,
+        1.0800000429153442,
+        1.0800000429153442,
+        1.350000023841858,
+        1.0800000429153442,
+        0.8999999761581421,
+        1.0800000429153442,
+        0.8999999761581421
+      ],
+      "epoch_logs": [
+        {
+          "epoch": 1,
+          "train_loss": 0.3346745265669831,
+          "val_loss": 0.10956933544827813,
+          "val_acc": 0.9666666666666667,
+          "val_f1": 0.9661103879561012,
+          "lr": 0.0001
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.17723730326164908,
+          "val_loss": 0.1024324028347353,
+          "val_acc": 0.9686419753086419,
+          "val_f1": 0.967999604406733,
+          "lr": 0.0001
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.13113323367224825,
+          "val_loss": 0.10579630270676287,
+          "val_acc": 0.9664197530864198,
+          "val_f1": 0.9659223515104143,
+          "lr": 0.0001
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.11365919304897776,
+          "val_loss": 0.10732649161905924,
+          "val_acc": 0.9728395061728395,
+          "val_f1": 0.972466774598848,
+          "lr": 5e-05
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.08063075859372444,
+          "val_loss": 0.07013192907241347,
+          "val_acc": 0.9723456790123457,
+          "val_f1": 0.9719153633372676,
+          "lr": 5e-05
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.06262685799759445,
+          "val_loss": 0.06285718094971623,
+          "val_acc": 0.9790123456790123,
+          "val_f1": 0.9784886187232578,
+          "lr": 5e-05
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.057525612850157504,
+          "val_loss": 0.062011977502587204,
+          "val_acc": 0.9797530864197531,
+          "val_f1": 0.9792282226330424,
+          "lr": 5e-05
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.05096904070467093,
+          "val_loss": 0.06186945367835148,
+          "val_acc": 0.9790123456790123,
+          "val_f1": 0.9782514184023319,
+          "lr": 5e-05
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.04520469770646932,
+          "val_loss": 0.06691135470001824,
+          "val_acc": 0.9790123456790123,
+          "val_f1": 0.9788254838651114,
+          "lr": 5e-05
+        }
+      ]
+    }
+  },
+  "epoch_log_path": "/kaggle/working/artifacts/reports/resnet50/resnet50_stage2_reference.training_log.tmp.json",
+  "metrics": {
+    "accuracy": 0.9787654320987654,
+    "macro_f1_score": 0.9784682223501147,
+    "precision": {
+      "AnnualCrop": 0.9754464285714286,
+      "Forest": 0.9977324263038548,
+      "HerbaceousVegetation": 0.9461206896551724,
+      "Highway": 0.9862258953168044,
+      "Industrial": 0.992,
+      "Pasture": 0.9797979797979798,
+      "PermanentCrop": 0.9604221635883905,
+      "Residential": 0.9889624724061811,
+      "River": 0.9734748010610079,
+      "SeaLake": 0.9889624724061811
+    },
+    "recall": {
+      "AnnualCrop": 0.9711111111111111,
+      "Forest": 0.9777777777777777,
+      "HerbaceousVegetation": 0.9755555555555555,
+      "Highway": 0.9546666666666667,
+      "Industrial": 0.992,
+      "Pasture": 0.97,
+      "PermanentCrop": 0.9706666666666667,
+      "Residential": 0.9955555555555555,
+      "River": 0.9786666666666667,
+      "SeaLake": 0.9955555555555555
+    },
+    "confusion_matrix": [
+      [
+        437,
+        0,
+        2,
+        0,
+        0,
+        1,
+        7,
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        440,
+        8,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        439,
+        0,
+        0,
+        3,
+        5,
+        0,
+        1,
+        2
+      ],
+      [
+        5,
+        0,
+        2,
+        358,
+        0,
+        0,
+        3,
+        0,
+        7,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        372,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      [
+        2,
+        1,
+        6,
+        0,
+        0,
+        291,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        3,
+        0,
+        6,
+        0,
+        0,
+        2,
+        364,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        448,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        1,
+        4,
+        1,
+        0,
+        0,
+        0,
+        367,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        448
+      ]
+    ]
+  }
+}

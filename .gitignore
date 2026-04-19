@@ -20,15 +20,16 @@ dist/
 .idea/
 .vscode/*.code-workspace
 
+# Local Copilot instruction files
+.github/copilot-instructions.md
+.github/instructions/
+
 # Runtime outputs
 runs/
-artifacts/*
-!artifacts/splits/
-artifacts/splits/*
-!artifacts/splits/split_manifest.json
+artifacts/
 checkpoints/
 logs/
-archive/*.zip
+archive/
 
 # Dataset storage
 data/*
